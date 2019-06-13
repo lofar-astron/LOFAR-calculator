@@ -1,5 +1,19 @@
 import dash_html_components as html
 import dash_bootstrap_components as dbc
+import dash_core_components as dcc
+
+###############################################################################
+# Default values for various input fields
+###############################################################################
+defaultParams = {'obsTime':'', 'Ncore':'24', 'Nremote':'14',
+                 'Nint':'13', 'Nchan':'64', 'Nsb':'488',
+                 'intTime':'1', 'hbaDual':'disable',
+                 
+                 'pipeType':'none', 'tAvg':'1', 'fAvg':'1', 
+                 'dyCompress':'enable',
+                 
+                 'imSize':'', 'rawSize':'', 'pipeSize':'', 'pipeProcTime':''
+                }
 
 ###############################################################################
 # Layout of the header
@@ -11,78 +25,72 @@ header = html.Div(children=[
 # Parameters common for all 3 sub-panels
 labelWidth = 8
 inpWidth = 3
+dropWidth = 4
 
 ###############################################################################
 # Layout of observational setup
 ###############################################################################
-hbaDualItems = [dbc.DropdownMenuItem("Disabled", active=True),
-                dbc.DropdownMenuItem("Enabled")
-               ]
 obsTime = dbc.FormGroup([
-            dbc.Label('Observation time (in hours)', 
-                      html_for='obsTimeRow', width=labelWidth),
+            dbc.Label('Observation time (in hours)', width=labelWidth),
             dbc.Col(
                 dbc.Input(type='text', id='obsTimeRow', style={'padding':'0px 0px'}), width=inpWidth
             )
           ], row=True)
 Ncore = dbc.FormGroup([
-            dbc.Label('Number of core stations', 
-                      html_for='nCoreRow', width=labelWidth),
+            dbc.Label('Number of core stations', width=labelWidth),
             dbc.Col(
-                dbc.Input(type='number', id='nCoreRow', min=0, max=24, value=24),
+                dbc.Input(type='number', id='nCoreRow', min=0, max=24),
                 width=inpWidth
             )
         ], row=True)
 Nremote = dbc.FormGroup([
-            dbc.Label('Number of remote stations', 
-                      html_for='nRemoteRow', width=labelWidth),
+            dbc.Label('Number of remote stations', width=labelWidth),
             dbc.Col(
-                dbc.Input(type='number', id='nRemoteRow', min=0, max=14, value=14), 
+                dbc.Input(type='number', id='nRemoteRow', min=0, max=14), 
                 width=inpWidth
             )            
         ], row=True)
 Nint = dbc.FormGroup([
-            dbc.Label('Number of international stations', 
-                      html_for='nIntRow', width=labelWidth),
+            dbc.Label('Number of international stations', width=labelWidth),
             dbc.Col(
-                dbc.Input(type='number', id='nIntRow', min=0, max=13, value=13), 
+                dbc.Input(type='number', id='nIntRow', min=0, max=13), 
                 width=inpWidth
             )
         ], row=True)
 Nchan = dbc.FormGroup([
-            dbc.Label('Number of channels per subband', 
-                      html_for='nChanRow', width=labelWidth),
+            dbc.Label('Number of channels per subband', width=labelWidth),
             dbc.Col(
-                dbc.Input(type='text', id='nChanRow', value=64), width=inpWidth
+                dbc.Input(type='text', id='nChanRow'), width=inpWidth
             )
         ], row=True)
 Nsb = dbc.FormGroup([
-            dbc.Label('Number of subbands', 
-                      html_for='nSbRow', width=labelWidth),
+            dbc.Label('Number of subbands', width=labelWidth),
             dbc.Col(
-                dbc.Input(type='text', id='nSbRow', value=488), width=inpWidth
+                dbc.Input(type='text', id='nSbRow'), width=inpWidth
             )
         ], row=True)
 intTime = dbc.FormGroup([
-            dbc.Label('Integration time (in seconds)', 
-                      html_for='intTimeRow', width=labelWidth),
+            dbc.Label('Integration time (in seconds)', width=labelWidth),
             dbc.Col(
-                dbc.Input(type='text', id='intTimeRow', value=1), width=inpWidth
+                dbc.Input(type='text', id='intTimeRow'), width=inpWidth
             )
         ], row=True)
 hbaDual = dbc.FormGroup([
-            dbc.Label('Observe in HBA Dual mode?', 
-                      html_for='hbaDualRow', width=labelWidth),
+            dbc.Label('Observe in HBA Dual mode?', width=labelWidth),
             dbc.Col(
-                dbc.DropdownMenu(bs_size='md', 
-                                 children=hbaDualItems, label='Disabled'),
-                width=inpWidth
+                dcc.Dropdown(
+                    options=[
+                        {'label':'Disable', 'value':'disable'},
+                        {'label':'Enable', 'value':'enable'}
+                    ], value='disable', searchable=False, 
+                       clearable=False, id='hbaDualRow'
+                ), width=dropWidth
             )
-        ], row=True)
+          ], row=True)
 buttons = html.Div([
             dbc.Row([
-                dbc.Col(dbc.Button('Calculate', color='dark')),
-                dbc.Col(dbc.Button('Reset', color='dark'))
+                dbc.Col(dbc.Button('Calculate', id='calculate', color='dark')),
+                dbc.Col(dbc.Button('Reset', id='reset', color='dark'))
             ])
           ])
 obsGUISetup = dbc.Form([obsTime, Ncore, Nremote, Nint, Nchan, 
@@ -96,43 +104,48 @@ obsGUIFrame = html.Div(children=[
 ###############################################################################
 # Define the layout of the pipeline setup
 ###############################################################################
-pipeList = [dbc.DropdownMenuItem("None", active=True),
-            dbc.DropdownMenuItem("Preprocessing")
-           ]
-dyCompressList = [dbc.DropdownMenuItem("Disabled"),
-                  dbc.DropdownMenuItem("Enabled", active=True)
-                 ]
 pipeType = dbc.FormGroup([
-                dbc.Label('Pipeline', html_for='pipeTypeRow', width=labelWidth),
-                dbc.Col(
-                    dbc.DropdownMenu(bs_size='md',
-                                     children=pipeList, label='None'),
-                    width=inpWidth
-                )
-           ], row=True)
+            dbc.Label('Pipeline', width=labelWidth),
+            dbc.Col(
+                dcc.Dropdown(
+                    options=[
+                        {'label':'None', 'value':'none'},
+                        {'label':'Preprocessing', 'value':'preprocessing'}
+                    ], value='none', searchable=False, 
+                       clearable=False, id='pipeTypeRow'
+                ), width=dropWidth
+            )
+          ], row=True)
 tAvg = dbc.FormGroup([
-           dbc.Label('Time averaging factor', html_for='tAvgRow', 
-                     width=labelWidth),
+           dbc.Label('Time averaging factor', width=labelWidth, 
+                     id='tAvgRowL'
+           ),
            dbc.Col(
-            dbc.Input(type='numeric', id='tAvgRow', min=0, value=1), 
+            dbc.Input(type='number', id='tAvgRow', min=0), 
             width=inpWidth
            )
        ], row=True)
 fAvg = dbc.FormGroup([
-           dbc.Label('Frequency averaging factor', html_for='fAvgRow', 
-                     width=labelWidth),
+           dbc.Label('Frequency averaging factor', width=labelWidth,
+                     id='fAvgRowL'
+           ),
            dbc.Col(
-            dbc.Input(type='numeric', id='fAvgRow', min=0, value=1), 
+            dbc.Input(type='number', id='fAvgRow', min=0), 
             width=inpWidth
            )
        ], row=True)
 dyCompress = dbc.FormGroup([
-                dbc.Label('Enable dysco compression?', html_for='fAvgRow', 
-                          width=labelWidth),
+                dbc.Label('Enable dysco compression?', width=labelWidth,
+                          id='dyCompressRowL'
+                ),
                 dbc.Col(
-                    dbc.DropdownMenu(bs_size='md', children=dyCompressList, 
-                                     label='Enabled'), 
-                    width=inpWidth
+                    dcc.Dropdown(
+                        options=[
+                            {'label':'Disable', 'value':'disable'},
+                            {'label':'Enable', 'value':'enable'}
+                        ], value='enable', searchable=False, 
+                           clearable=False, id='dyCompressRow'
+                    ), width=dropWidth
                 )
              ], row=True)
 pipeGUISetup = dbc.Form([pipeType, tAvg, fAvg, dyCompress])
@@ -146,24 +159,21 @@ pipeGUIFrame = html.Div(children=[
 # Layout of the results tab
 ###############################################################################
 imNoise = dbc.FormGroup([
-            dbc.Label('Theoretical image noise', 
-                      html_for='inNoiseRow', width=labelWidth),
+            dbc.Label('Theoretical image noise', width=labelWidth),
             dbc.Col(
                 dbc.Input(type='text', id='inNoiseRow', disabled=True), 
                 width=inpWidth
             )
           ], row=True)
 rawSize = dbc.FormGroup([
-            dbc.Label('Raw data size (in GB)', 
-                      html_for='rawSizeRow', width=labelWidth),
+            dbc.Label('Raw data size (in GB)', width=labelWidth),
             dbc.Col(
                 dbc.Input(type='text', id='rawSizeRow', disabled=True), 
                 width=inpWidth
             )
           ], row=True)
 pipeSize = dbc.FormGroup([
-            dbc.Label('Processed data size (in GB)', 
-                      html_for='pipeSizeeRow', width=labelWidth),
+            dbc.Label('Processed data size (in GB)', width=labelWidth),
             dbc.Col(
                 dbc.Input(type='text', id='pipeSizeRow', disabled=True), 
                 width=inpWidth
@@ -171,7 +181,7 @@ pipeSize = dbc.FormGroup([
           ], row=True)
 pipeProcTime = dbc.FormGroup([
                   dbc.Label('Pipeline processing time (in hours)', 
-                            html_for='pipeProcTimeRow', width=labelWidth),
+                            width=labelWidth),
                   dbc.Col(
                      dbc.Input(type='text', id='pipeProcTimeRow', 
                                disabled=True), 
@@ -184,13 +194,3 @@ resultGUIFrame = html.Div(children=[
                     html.Hr(),
                     resultGUISetup
                  ], style={'width':'95%', 'padding':'20px'})
-
-###############################################################################
-# Layout of the footer which contains the buttons
-###############################################################################
-footer = html.Div([
-            dbc.Row([
-                dbc.Col(dbc.Button('Calculate', id='calculate', color='dark')),
-                dbc.Col(dbc.Button('Reset', id='reset', color='dark'))
-             ])
-         ], style={'width':'20%', 'padding':'0px 20px'})
