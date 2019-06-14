@@ -11,8 +11,6 @@ defaultParams = {'obsTime':'', 'Ncore':'24', 'Nremote':'14',
                  
                  'pipeType':'none', 'tAvg':'1', 'fAvg':'1', 
                  'dyCompress':'enable',
-                 
-                 'imSize':'', 'rawSize':'', 'pipeSize':'', 'pipeProcTime':''
                 }
 
 ###############################################################################
@@ -31,7 +29,7 @@ dropWidth = 4
 # Layout of observational setup
 ###############################################################################
 obsTime = dbc.FormGroup([
-            dbc.Label('Observation time (in hours)', width=labelWidth),
+            dbc.Label('Observation time (in seconds)', width=labelWidth),
             dbc.Col(
                 dbc.Input(type='text', id='obsTimeRow', style={'padding':'0px 0px'}), width=inpWidth
             )
@@ -90,7 +88,7 @@ hbaDual = dbc.FormGroup([
 buttons = html.Div([
             dbc.Row([
                 dbc.Col(dbc.Button('Calculate', id='calculate', color='dark')),
-                dbc.Col(dbc.Button('Reset', id='reset', color='dark'))
+                dbc.Col(dbc.Button('Reset inputs', id='reset', color='dark'))
             ])
           ])
 obsGUISetup = dbc.Form([obsTime, Ncore, Nremote, Nint, Nchan, 
@@ -161,31 +159,34 @@ pipeGUIFrame = html.Div(children=[
 imNoise = dbc.FormGroup([
             dbc.Label('Theoretical image noise', width=labelWidth),
             dbc.Col(
-                dbc.Input(type='text', id='inNoiseRow', disabled=True), 
-                width=inpWidth
+                dbc.Input(type='text', id='imNoiseRow', value='', 
+                          disabled=True
+                ), width=inpWidth
             )
           ], row=True)
 rawSize = dbc.FormGroup([
             dbc.Label('Raw data size (in GB)', width=labelWidth),
             dbc.Col(
-                dbc.Input(type='text', id='rawSizeRow', disabled=True), 
-                width=inpWidth
+                dbc.Input(type='text', id='rawSizeRow', value='', 
+                          disabled=True
+                ), width=inpWidth
             )
           ], row=True)
 pipeSize = dbc.FormGroup([
             dbc.Label('Processed data size (in GB)', width=labelWidth),
             dbc.Col(
-                dbc.Input(type='text', id='pipeSizeRow', disabled=True), 
-                width=inpWidth
+                dbc.Input(type='text', id='pipeSizeRow', value='', 
+                          disabled=True
+                ), width=inpWidth
             )
           ], row=True)
 pipeProcTime = dbc.FormGroup([
                   dbc.Label('Pipeline processing time (in hours)', 
                             width=labelWidth),
                   dbc.Col(
-                     dbc.Input(type='text', id='pipeProcTimeRow', 
-                               disabled=True), 
-                     width=inpWidth
+                     dbc.Input(type='text', id='pipeProcTimeRow', value='',
+                               disabled=True
+                     ), width=inpWidth
                   )
                ], row=True)
 resultGUISetup = dbc.Form([imNoise, rawSize, pipeSize, pipeProcTime])

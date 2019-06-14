@@ -6,9 +6,10 @@ __email__  = "sarrvesh@astron.nl"
 import dash
 import dash_html_components as html
 import dash_bootstrap_components as dbc
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 from gui import header, obsGUIFrame, pipeGUIFrame, resultGUIFrame
 from gui import defaultParams
+import backend as bk
 
 # Initialize the dash app
 # dbc.themes.LUMEN looks nice
@@ -69,11 +70,6 @@ def toggle_pipeline(value):
        Output('tAvgRow','value'),
        Output('fAvgRow','value'),
        
-       Output('inNoiseRow','value'),
-       Output('rawSizeRow','value'),
-       Output('pipeSizeRow','value'),
-       Output('pipeProcTimeRow','value'),
-       
        Output('hbaDualRow','value'),
        Output('pipeTypeRow','value'),
        Output('dyCompressRow','value')
@@ -82,29 +78,55 @@ def toggle_pipeline(value):
 )
 def on_reset_click(n):
    """Function defines what to do when the reset button is clicked"""
-   if n is None:
-      # Reset button has not been clicked yet 
-      # So, do nothing
-      return defaultParams['obsTime'], defaultParams['Ncore'], \
-             defaultParams['Nremote'], defaultParams['Nint'], \
-             defaultParams['Nchan'], defaultParams['Nsb'], \
-             defaultParams['intTime'], defaultParams['tAvg'], \
-             defaultParams['fAvg'], defaultParams['imSize'], \
-             defaultParams['rawSize'], defaultParams['pipeSize'], \
-             defaultParams['pipeProcTime'], defaultParams['hbaDual'], \
-             defaultParams['pipeType'], defaultParams['dyCompress']
-   else:
-      # Reset button has been clicked
-      # Restore all input and output fields to default
-      return defaultParams['obsTime'], defaultParams['Ncore'], \
-             defaultParams['Nremote'], defaultParams['Nint'], \
-             defaultParams['Nchan'], defaultParams['Nsb'], \
-             defaultParams['intTime'], defaultParams['tAvg'], \
-             defaultParams['fAvg'], defaultParams['imSize'], \
-             defaultParams['rawSize'], defaultParams['pipeSize'], \
-             defaultParams['pipeProcTime'], defaultParams['hbaDual'], \
-             defaultParams['pipeType'], defaultParams['dyCompress']
-      
+   return defaultParams['obsTime'], defaultParams['Ncore'], \
+          defaultParams['Nremote'], defaultParams['Nint'], \
+          defaultParams['Nchan'], defaultParams['Nsb'], \
+          defaultParams['intTime'], defaultParams['tAvg'], \
+          defaultParams['fAvg'], defaultParams['hbaDual'], \
+          defaultParams['pipeType'], defaultParams['dyCompress']
+
+#######################################
+# What should the submit button do?
+#######################################
+@app.callback(
+    [
+        Output('imNoiseRow','value'),
+        Output('rawSizeRow','value'),
+        Output('pipeSizeRow','value'),
+        Output('pipeProcTimeRow','value'),
+    ],
+    [ Input('calculate','n_clicks') ],
+    [
+        State('obsTimeRow','value'),
+        State('nCoreRow','value'),
+        State('nRemoteRow','value'),
+        State('nIntRow','value'),
+        State('nChanRow','value'),
+        State('nSbRow','value'),
+        State('intTimeRow','value'),
+        State('hbaDualRow','value'),
+        State('pipeTypeRow','value'),
+        State('tAvgRow','value'),
+        State('fAvgRow','value'),
+        State('dyCompressRow','value')
+    ]
+)
+def on_calculate_click(n, obsT, nCore, nRemote, nInt, nChan, nSB, 
+                       integT, hbaMode, pipeType, tAvg, fAvg, dyCompress):
+    """Function defines what to do when the calculate button is clicked"""
+    if n is None:
+        # Calculate button has not been clicked yet
+        # So, do nothing and set default values to results field
+        return '', '', '', ''
+    else:
+        # Calculate button has been clicked.
+        # First, validate all command line inputs
+        # Estimate the raw data size
+        nBaselines = bk.compute_baselines(int(nCore), int(nRemote), 
+                                          int(nInt), hbaMode)
+        rawSize = bk.calculate_raw_size(float(obsT), float(integT), 
+                                        nBaselines, int(nChan), int(nSB))
+        return 0, rawSize, 0, 0
 
 if __name__ == '__main__':
     app.run_server(debug=True)
