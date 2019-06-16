@@ -7,26 +7,18 @@ import dash
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
+from gui import layout
 from gui import header, obsGUIFrame, pipeGUIFrame, resultGUIFrame
 from gui import defaultParams, msgBoxObsT, msgBoxnSB, msgBoxIntT, msgBox
 import backend as bk
 
 # Initialize the dash app
-# dbc.themes.LUMEN looks nice
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LUMEN])
 
 #######################################
 # Setup the layout of the web interface
 #######################################
-app.layout = html.Div([
-                dbc.Row(dbc.Col(header)),
-                dbc.Row([
-                   dbc.Col(obsGUIFrame),
-                   dbc.Col(pipeGUIFrame),
-                   dbc.Col(resultGUIFrame)
-                ]),
-                msgBoxObsT, msgBoxnSB, msgBoxIntT, msgBox
-             ])
+app.layout = layout
 
 ##############################################
 # Show pipeline fields based on dropdown value

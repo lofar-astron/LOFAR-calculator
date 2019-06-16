@@ -228,3 +228,16 @@ resultGUIFrame = html.Div(children=[
                     html.Hr(),
                     resultGUISetup
                  ], style={'width':'95%', 'padding':'20px'})
+                 
+###############################################################################
+# Define the layout of the calculator
+###############################################################################
+layout = html.Div([
+                     dbc.Row(dbc.Col(header)),
+                     dbc.Row([
+                                dbc.Col(obsGUIFrame),
+                                dbc.Col(pipeGUIFrame),
+                                dbc.Col(resultGUIFrame)
+                     ]),
+                     msgBoxObsT, msgBoxnSB, msgBoxIntT, msgBox
+                  ])
