@@ -121,12 +121,20 @@ def on_calculate_click(n, obsT, nCore, nRemote, nInt, nChan, nSB,
     else:
         # Calculate button has been clicked.
         # First, validate all command line inputs
-        # Estimate the raw data size
-        nBaselines = bk.compute_baselines(int(nCore), int(nRemote), 
-                                          int(nInt), hbaMode)
-        rawSize = bk.calculate_raw_size(float(obsT), float(integT), 
-                                        nBaselines, int(nChan), int(nSB))
-        return 0, rawSize, 0, 0
+        status, msg = bk.validate_inputs(obsT, nSB, integT)
+        if status is False:
+           print(msg)
+           return '', '', '', ''
+        else:
+           # Estimate the raw data size
+           nBaselines = bk.compute_baselines(int(nCore), int(nRemote), 
+                                             int(nInt), hbaMode)
+           rawSize = bk.calculate_raw_size(float(obsT), float(integT), 
+                                           nBaselines, int(nChan), int(nSB))
+           avgSize = bk.calculate_avg_size(float(obsT), float(integT), nBaselines,
+                                           int(nChan), int(nSB), pipeType, 
+                                           int(tAvg), int(fAvg), dyCompress)
+           return 0, rawSize, avgSize, 0
 
 if __name__ == '__main__':
     app.run_server(debug=True)

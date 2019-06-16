@@ -58,7 +58,7 @@ Nint = dbc.FormGroup([
 Nchan = dbc.FormGroup([
             dbc.Label('Number of channels per subband', width=labelWidth),
             dbc.Col(
-                dbc.Input(type='text', id='nChanRow'), width=inpWidth
+                dbc.Input(type='number', id='nChanRow', min=0, max=256), width=inpWidth
             )
         ], row=True)
 Nsb = dbc.FormGroup([
@@ -81,7 +81,7 @@ hbaDual = dbc.FormGroup([
                         {'label':'Disable', 'value':'disable'},
                         {'label':'Enable', 'value':'enable'}
                     ], value='disable', searchable=False, 
-                       clearable=False, id='hbaDualRow'
+                       clearable=False, id='hbaDualRow',
                 ), width=dropWidth
             )
           ], row=True)
