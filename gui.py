@@ -3,9 +3,42 @@ import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 
 ###############################################################################
+# Define a modal to display error messages for observation time
+###############################################################################
+modalHeader = html.H2('Error')
+msgBoxObsT = dbc.Modal([
+                       dbc.ModalHeader(modalHeader),                       
+                       dbc.ModalBody('Invalid observation time specified'),
+                       dbc.ModalFooter(
+                                      dbc.Button('Close', id='mbObsTClose')
+                                      )
+                       ], id='msgboxObsT', centered=True)
+msgBoxnSB = dbc.Modal([
+                         dbc.ModalHeader(modalHeader),
+                         dbc.ModalBody('Invalid number of subbands specified'),
+                         dbc.ModalFooter(
+                                        dbc.Button('Close', id='mbnSBClose')
+                                        )
+                      ], id='msgboxnSB', centered=True)
+msgBoxIntT = dbc.Modal([
+                         dbc.ModalHeader(modalHeader),
+                         dbc.ModalBody('Invalid integration time specified'),
+                         dbc.ModalFooter(
+                                        dbc.Button('Close', id='mbintTClose')
+                                        )
+                       ], id='msgboxIntT', centered=True)
+msgBox = dbc.Modal([
+                      dbc.ModalHeader(modalHeader),
+                      dbc.ModalBody('', id='msgBoxBody'),
+                      dbc.ModalFooter(
+                                     dbc.Button('Close', id='msgBoxClose')
+                                     )
+                   ], id='msgbox', centered=True)
+
+###############################################################################
 # Default values for various input fields
 ###############################################################################
-defaultParams = {'obsTime':'', 'Ncore':'24', 'Nremote':'14',
+defaultParams = {'obsTime':'28800', 'Ncore':'24', 'Nremote':'14',
                  'Nint':'13', 'Nchan':'64', 'Nsb':'488',
                  'intTime':'1', 'hbaDual':'disable',
                  
@@ -31,7 +64,7 @@ dropWidth = 4
 obsTime = dbc.FormGroup([
             dbc.Label('Observation time (in seconds)', width=labelWidth),
             dbc.Col(
-                dbc.Input(type='text', id='obsTimeRow', style={'padding':'0px 0px'}), width=inpWidth
+                dbc.Input(type='text', id='obsTimeRow'), width=inpWidth
             )
           ], row=True)
 Ncore = dbc.FormGroup([

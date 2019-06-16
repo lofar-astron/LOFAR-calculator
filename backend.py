@@ -48,29 +48,28 @@ def validate_inputs(obsT, nSB, integT):
          - integT is a valid positive number
       Return state=True/False accompanied by an error msg
       Note: all input parameters are still strings."""
-   # Check if observation time is a valid number
+   msg = ''
    try:
       float(obsT)
+      if not float(obsT) > 0:
+         msg += 'Observation time cannot be zero or negative.\n'
    except ValueError:
-      return False, 'Invalid observation time specified.'
-   # Check if observation time is positive
-   if not float(obsT) > 0:
-      return False, 'Observation time cannot be zero or negative.'
-   # Check if the number of subbands is a valid number
+      msg += 'Invalid observation time specified.\n'
+   # Validate the number of subbands
    try:
       int(nSB)
+      if int(nSB) < 1:
+         msg += 'Number of subbands cannot be less than 1.\n'
    except ValueError:
-      return False, 'Invalid number of subbands specified.'
-   # Check if the number of subband is greater than or equal to 1
-   if int(nSB) < 1:
-      return False, 'Number of subbands cannot be less than 1.'
-   # Check if integration time is a number
+      msg += 'Invalid number of subbands specified.\n'
+   # Validate integration time
    try:
       float(integT)
+      if float(integT) <= 0.:
+         msg += 'Invalid integration time specified.\n'
    except:
-      return False, 'Invalid integration time specified.'
-   # Check if integration time is greater than 0
-   if float(integT) <= 0.:
-      return False, 'Invalid integration time specified.'
-   # If all checks pass, return True
-   return True, None
+      msg += 'Invalid integration time specified.\n'
+   if msg is not '':
+      return False, msg
+   else:
+      return True, msg
