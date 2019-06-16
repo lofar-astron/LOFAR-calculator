@@ -112,7 +112,7 @@ def validate_obsT(n_blur, n_clicks, value, is_open):
    if n_blur is None:
       # The page is loading. Do not validate anything
       return False
-   elif n_blur >= 1:
+   else:
       # Observation time text box has lost focus. 
       # Go ahead and validate the text in it.
       try:
@@ -121,8 +121,6 @@ def validate_obsT(n_blur, n_clicks, value, is_open):
          return True
       if not int(value) > 0:
          return True
-      return False
-   else:
       return False
 
 #######################################
@@ -148,7 +146,7 @@ def validate_obsT(n_blur, n_clicks, value, is_open):
    if n_blur is None:
       # The page is loading. Do not validate anything
       return False
-   elif n_blur >= 1:
+   else:
       # Observation time text box has lost focus. 
       # Go ahead and validate the text in it.
       try:
@@ -157,8 +155,6 @@ def validate_obsT(n_blur, n_clicks, value, is_open):
          return True
       if not int(value) > 0:
          return True
-      return False
-   else:
       return False
 
 #######################################
