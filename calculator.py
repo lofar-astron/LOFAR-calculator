@@ -21,6 +21,11 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LUMEN])
 app.layout = layout
 
 ##############################################
+# TODO: Move all callbacks to a separate file
+# See https://community.plot.ly/t/dash-callback-in-a-separate-file/14122/16
+##############################################
+
+##############################################
 # Show pipeline fields based on dropdown value
 ##############################################
 @app.callback(
@@ -41,7 +46,7 @@ def toggle_pipeline(value):
         return {'display':'none'}, {'display':'none'}, \
                {'display':'none'}, {'display':'none'}, \
                {'display':'none'}, {'display':'none'}
-    elif value == 'preprocessing':
+    elif value == 'preprocessing' or value=='prefactor':
         #style['display'] = 'block'
         return {'display':'block'}, {'display':'block'}, \
                {'display':'block'}, {'display':'block'}, \
@@ -95,8 +100,8 @@ def validate_obsT(n_blur, n_clicks, value, is_open):
       State('msgboxnSB', 'is_open')
    ]
 )
-def validate_obsT(n_blur, n_clicks, value, is_open):
-   """Validate observation time and display error message if needed"""   
+def validate_nSB(n_blur, n_clicks, value, is_open):
+   """Validate the number of subbands and display error message if needed"""   
    if is_open is True and n_clicks is not None:
       # The message box is open and the user has clicked the close
       # button. Close the alert message
@@ -129,8 +134,8 @@ def validate_obsT(n_blur, n_clicks, value, is_open):
       State('msgboxIntT', 'is_open')
    ]
 )
-def validate_obsT(n_blur, n_clicks, value, is_open):
-   """Validate observation time and display error message if needed"""   
+def validate_integT(n_blur, n_clicks, value, is_open):
+   """Validate the integration time and display error message if needed"""   
    if is_open is True and n_clicks is not None:
       # The message box is open and the user has clicked the close
       # button. Close the alert message
@@ -146,6 +151,70 @@ def validate_obsT(n_blur, n_clicks, value, is_open):
       except ValueError:
          return True
       if not int(value) > 0:
+         return True
+      return False
+
+#######################################
+# Validate time averaging factor
+#######################################
+@app.callback(
+   Output('msgboxTAvg', 'is_open'),
+   [ 
+      Input('tAvgRow', 'n_blur'), 
+      Input('mbtAvgClose', 'n_clicks') 
+   ],
+   [ 
+      State('tAvgRow', 'value'),
+      State('msgboxTAvg', 'is_open')
+   ]
+)
+def validate_tAvg(n_blur, n_clicks, value, is_open):
+   """Validate time averaging factor and display error message if needed"""
+   if is_open is True and n_clicks is not None:
+      # The message box is open and the user has clicked the close
+      # button. Close the alert message
+      return False  
+   if n_blur is None:
+      # The page is loading. Do not validate anything
+      return False
+   else:
+      # Text box has lost focus. 
+      # Go ahead and validate the text in it.
+      try:
+         int(str(value))
+      except ValueError:
+         return True
+      return False
+
+#######################################
+# Validate freq averaging factor
+#######################################
+@app.callback(
+   Output('msgboxFAvg', 'is_open'),
+   [ 
+      Input('fAvgRow', 'n_blur'), 
+      Input('mbfAvgClose', 'n_clicks') 
+   ],
+   [ 
+      State('fAvgRow', 'value'),
+      State('msgboxFAvg', 'is_open')
+   ]
+)
+def validate_tAvg(n_blur, n_clicks, value, is_open):
+   """Validate frequency averaging factor and display error message if needed"""
+   if is_open is True and n_clicks is not None:
+      # The message box is open and the user has clicked the close
+      # button. Close the alert message
+      return False  
+   if n_blur is None:
+      # The page is loading. Do not validate anything
+      return False
+   else:
+      # Text box has lost focus. 
+      # Go ahead and validate the text in it.
+      try:
+         int(str(value))
+      except ValueError:
          return True
       return False
 
@@ -225,7 +294,7 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
     else:
         # Calculate button has been clicked.
         # First, validate all command line inputs
-        status, msg = bk.validate_inputs(obsT, nSB, integT)
+        status, msg = bk.validate_inputs(obsT, nSB, integT, tAvg, fAvg)
         if status is False:
            print(msg)
            return '', '', '', '', msg, True

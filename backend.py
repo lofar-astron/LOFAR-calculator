@@ -40,15 +40,18 @@ def calculate_avg_size(obsT, intTime, nBaselines, nChan, nSB, pipeType, tAvg,
    else:
       pass
 
-def validate_inputs(obsT, nSB, integT):
+def validate_inputs(obsT, nSB, integT, tAvg, fAvg):
    """Valid text input supplied by the user: observation time, number of 
       subbands, and integration time. Following checks will be performed:
          - obsTime is a valid positive number
          - nSB is an integer and is at least 1 or greater
          - integT is a valid positive number
+         - tAvg is an integer
+         - fAvg is an integer
       Return state=True/False accompanied by an error msg
       Note: all input parameters are still strings."""
    msg = ''
+   # Validate the length of the observing time
    try:
       float(obsT)
       if not float(obsT) > 0:
@@ -69,6 +72,17 @@ def validate_inputs(obsT, nSB, integT):
          msg += 'Invalid integration time specified.\n'
    except:
       msg += 'Invalid integration time specified.\n'
+   # Validate time averaging factor
+   try:
+      int(str(tAvg))
+   except ValueError:
+      msg += 'Invalid time averaging factor specified.'
+   # Validate frequency averaging factor
+   try:
+      int(str(fAvg))
+   except ValueError:
+      msg += 'Invalid frequency averaging factor specified.'
+   # If any error has been triggered above, return the error message
    if msg is not '':
       return False, msg
    else:

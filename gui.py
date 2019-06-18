@@ -27,6 +27,20 @@ msgBoxIntT = dbc.Modal([
                                         dbc.Button('Close', id='mbintTClose')
                                         )
                        ], id='msgboxIntT', centered=True)
+msgBoxTAvg = dbc.Modal([
+                         dbc.ModalHeader(modalHeader),
+                         dbc.ModalBody('Invalid time averaging factor specified'),
+                         dbc.ModalFooter(
+                                        dbc.Button('Close', id='mbtAvgClose')
+                                        )
+                       ], id='msgboxTAvg', centered=True)
+msgBoxFAvg = dbc.Modal([
+                         dbc.ModalHeader(modalHeader),
+                         dbc.ModalBody('Invalid frequency averaging factor specified'),
+                         dbc.ModalFooter(
+                                        dbc.Button('Close', id='mbfAvgClose')
+                                        )
+                       ], id='msgboxFAvg', centered=True)
 msgBox = dbc.Modal([
                       dbc.ModalHeader(modalHeader),
                       dbc.ModalBody('', id='msgBoxBody'),
@@ -141,7 +155,8 @@ pipeType = dbc.FormGroup([
                 dcc.Dropdown(
                     options=[
                         {'label':'None', 'value':'none'},
-                        {'label':'Preprocessing', 'value':'preprocessing'}
+                        {'label':'Preprocessing', 'value':'preprocessing'},
+                        {'label':'Prefactor', 'value':'prefactor'}
                     ], value='none', searchable=False, 
                        clearable=False, id='pipeTypeRow'
                 ), width=dropWidth
@@ -239,5 +254,6 @@ layout = html.Div([
                                 dbc.Col(pipeGUIFrame),
                                 dbc.Col(resultGUIFrame)
                      ]),
-                     msgBoxObsT, msgBoxnSB, msgBoxIntT, msgBox
+                     msgBoxObsT, msgBoxnSB, msgBoxIntT, msgBoxTAvg, msgBoxFAvg,
+                     msgBox
                   ])
