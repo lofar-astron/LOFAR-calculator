@@ -21,8 +21,8 @@ def calculate_raw_size(obsT, intTime, nBaselines, nChan, nSB):
    totSize = sbSize * nSB
    return totSize
 
-def calculate_avg_size(obsT, intTime, nBaselines, nChan, nSB, pipeType, tAvg, 
-                       fAvg, dyCompress):
+def calculate_proc_size(obsT, intTime, nBaselines, nChan, nSB, pipeType, tAvg, 
+                        fAvg, dyCompress):
    """Compute the datasize of averaged LOFAR measurement set given the
       length of the observation, integration time, number of baselines,
       pipeline type, time and frequency averaging factor, and
