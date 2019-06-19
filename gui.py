@@ -64,7 +64,7 @@ defaultParams = {'obsTime':'28800', 'Ncore':'24', 'Nremote':'14',
 # Layout of the header
 ###############################################################################
 header = html.Div(children=[
-            html.H1('LOFAR data size and processing time calculator')
+            html.H1('LOFAR Calculator For Imaging Observations')
          ], style={'padding':'10px 10px'})
 
 # Parameters common for all 3 sub-panels

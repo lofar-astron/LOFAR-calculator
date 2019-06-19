@@ -6,13 +6,13 @@ def compute_baselines(nCore, nRemote, nInt, hbaMode):
       nStations = (2*nCore)+nRemote+nInt
    else:
       nStations = nCore+nRemote+nInt
-   return (nStations*(nStations-1))/2 + nStations
+   return (nStations*(nStations+1))/2
 
 def calculate_raw_size(obsT, intTime, nBaselines, nChan, nSB):
    """Compute the datasize of a raw LOFAR measurement set given the 
       length of the observation, correlator integration time, number 
       of baselines, number of channels per subband, and number of subbands"""
-   nRows = int( nBaselines * (obsT / intTime) )
+   nRows = int( nBaselines * (obsT / intTime) ) - nBaselines
    # A single row in LofarStMan format contains 
    #    - 32-bit sequence number (4 bytes)
    #    - nChan*16-bit samples for weight and sigma calculation (2*nChan bytes)
@@ -28,15 +28,24 @@ def calculate_avg_size(obsT, intTime, nBaselines, nChan, nSB, pipeType, tAvg,
       pipeline type, time and frequency averaging factor, and
       enable dysco compression."""
    if pipeType == 'none':
-      return 0
+      return ''
    elif pipeType == 'preprocessing':
       # Change nChan to account for fAvg
       nChan //= fAvg
       # Change integT to account for tAvg
       intTime *= tAvg
-      nRows = int( nBaselines * (obsT / intTime) )
+      nRows = int( nBaselines * (obsT / intTime) ) - nBaselines
       # What does a single row in an averaged MS contain?
-      return 0
+      sbSize = nRows * ((7*8) + \
+                        (4+(4*nChan)) + \
+                        (4*11) + \
+                        (8*1) + \
+                        (4) + \
+                        (4 * (8 + 8*nChan + 4*nChan)) )
+      # Convert byte length to GB
+      sbSize /= (1024*1024*1024)
+      totSize = sbSize * nSB
+      return totSize
    else:
       pass
 
