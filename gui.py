@@ -64,7 +64,7 @@ defaultParams = {'obsTime':'28800', 'Ncore':'24', 'Nremote':'14',
 # Layout of the header
 ###############################################################################
 header = html.Div(children=[
-            html.H1('LOFAR Calculator For Imaging Observations')
+            html.H1('LOFAR Unified Calculator for Imaging (LUCI)')
          ], style={'padding':'10px 10px'})
 
 # Parameters common for all 3 sub-panels
@@ -156,7 +156,7 @@ pipeType = dbc.FormGroup([
                     options=[
                         {'label':'None', 'value':'none'},
                         {'label':'Preprocessing', 'value':'preprocessing'},
-                        {'label':'Prefactor', 'value':'prefactor'}
+                        #{'label':'Prefactor', 'value':'prefactor'}
                     ], value='none', searchable=False, 
                        clearable=False, id='pipeTypeRow'
                 ), width=dropWidth
@@ -205,7 +205,7 @@ pipeGUIFrame = html.Div(children=[
 # Layout of the results tab
 ###############################################################################
 imNoise = dbc.FormGroup([
-            dbc.Label('Theoretical image noise', width=labelWidth),
+            dbc.Label('Theoretical image sensitivity (uJy/beam)', width=labelWidth),
             dbc.Col(
                 dbc.Input(type='text', id='imNoiseRow', value='', 
                           disabled=True
@@ -237,7 +237,14 @@ pipeProcTime = dbc.FormGroup([
                      ), width=inpWidth
                   )
                ], row=True)
-resultGUISetup = dbc.Form([imNoise, rawSize, pipeSize, pipeProcTime])
+warntext = '**Caution:** The sensitivity calculation performed by this tool follow '+\
+           ' [SKA Memo 113](http://www.skatelescope.org/uploaded/59513_113_Memo_Nijboer.pdf) '+\
+           'by Nijboer, Pandey-Pommier & de Bruyn.'+\
+           ' It uses theoretical SEFD values. So, please use it with caution.'
+cautiontext = html.Div([
+                  dcc.Markdown(children=warntext)
+              ], style={'width':'85%'})
+resultGUISetup = dbc.Form([imNoise, rawSize, pipeSize, pipeProcTime, cautiontext])
 resultGUIFrame = html.Div(children=[
                     html.H3('Results'),
                     html.Hr(),

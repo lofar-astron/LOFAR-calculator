@@ -302,12 +302,14 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
            # Estimate the raw data size
            nBaselines = bk.compute_baselines(int(nCore), int(nRemote), 
                                              int(nInt), hbaMode)
+           imNoise = bk.calculate_im_noise(int(nCore), int(nRemote),
+                                           int(nInt), hbaMode, float(obsT), int(nSB))
            rawSize = bk.calculate_raw_size(float(obsT), float(integT), 
                                            nBaselines, int(nChan), int(nSB))
            avgSize = bk.calculate_proc_size(float(obsT), float(integT), nBaselines,
                                             int(nChan), int(nSB), pipeType, 
                                             int(tAvg), int(fAvg), dyCompress)
-           return 0, rawSize, avgSize, 0, '', False
+           return imNoise, rawSize, avgSize, 0, '', False
 
 if __name__ == '__main__':
     app.run_server(debug=True)
