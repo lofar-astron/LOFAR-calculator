@@ -15,6 +15,7 @@ import targetvis as tv
 import generatepdf as g
 import os
 from random import randint
+import plotly.graph_objs as go
 
 # Initialize the dash app
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LUMEN])
@@ -365,7 +366,8 @@ def on_reset_click(n):
        Output('pipeProcTimeRow','value'),
        Output('msgBoxBody', 'children'),
        Output('msgbox', 'is_open'),
-       Output('graphRow', 'style')
+       Output('graphRow', 'style'),
+       Output('elevation-plot', 'figure')
     ],
     [  Input('calculate','n_clicks'), 
        Input('msgBoxClose', 'n_clicks')
@@ -390,18 +392,18 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
     """Function defines what to do when the calculate button is clicked"""
     if is_open is True:
        # User has closed the error message box
-       return '', '', '', '', '', False, {'display':'none'}
+       return '', '', '', '', '', False, {'display':'none'}, {}
     if n is None:
         # Calculate button has not been clicked yet
         # So, do nothing and set default values to results field
-        return '', '', '', '', '', False, {'display':'none'}
+        return '', '', '', '', '', False, {'display':'none'}, {}
     else:
         # Calculate button has been clicked.
         # First, validate all command line inputs
         status, msg = bk.validate_inputs(obsT, nSB, integT, tAvg, fAvg)
         if status is False:
            print(msg)
-           return '', '', '', '', msg, True, {'display':'none'}
+           return '', '', '', '', msg, True, {'display':'none'}, {}
         else:
            # Estimate the raw data size
            nBaselines = bk.compute_baselines(int(nCore), int(nRemote), 
@@ -413,8 +415,16 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
            avgSize = bk.calculate_proc_size(float(obsT), float(integT), nBaselines,
                                             int(nChan), int(nSB), pipeType, 
                                             int(tAvg), int(fAvg), dyCompress)
+           plotFig = {'data':[{ 'type':'scatter',
+                                'y': [1,2,3]
+                             }],
+                      'layout':go.Layout(
+                                 xaxis={'title':'Time (UTC)'},
+                                 yaxis={'title':'Elevation'}
+                               )
+                     }
            return imNoise, rawSize, avgSize, 0, '', \
-                  False, {'display':'block'}
+                  False, {'display':'block'}, plotFig
 
 if __name__ == '__main__':
     app.run_server(debug=True)
