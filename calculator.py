@@ -39,7 +39,11 @@ app.layout = layout
         Output('fAvgRowL','style'),
         Output('fAvgRow','style'),
         Output('dyCompressRowL','style'),
-        Output('dyCompressRow','style')
+        Output('dyCompressRow','style'),
+        Output('pipeSizeRowL', 'style'),
+        Output('pipeSizeRow', 'style'),
+        Output('pipeProcTimeRow', 'style'),
+        Output('pipeProcTimeRowL', 'style')
     ],
     [Input('pipeTypeRow','value')]
 )
@@ -49,9 +53,13 @@ def toggle_pipeline(value):
     if value == 'none':
         return {'display':'none'}, {'display':'none'}, \
                {'display':'none'}, {'display':'none'}, \
+               {'display':'none'}, {'display':'none'}, \
+               {'display':'none'}, {'display':'none'}, \
                {'display':'none'}, {'display':'none'}
     elif value == 'preprocessing':
         return {'display':'block'}, {'display':'block'}, \
+               {'display':'block'}, {'display':'block'}, \
+               {'display':'block'}, {'display':'block'}, \
                {'display':'block'}, {'display':'block'}, \
                {'display':'block'}, {'display':'block'}
 

@@ -270,7 +270,8 @@ rawSize = dbc.FormGroup([
             )
           ], row=True)
 pipeSize = dbc.FormGroup([
-            dbc.Label('Processed data size (in GB)', width=labelWidth),
+            dbc.Label('Processed data size (in GB)', width=labelWidth,
+                      id='pipeSizeRowL'),
             dbc.Col(
                 dbc.Input(type='text', id='pipeSizeRow', value='', 
                           disabled=True
@@ -279,7 +280,7 @@ pipeSize = dbc.FormGroup([
           ], row=True)
 pipeProcTime = dbc.FormGroup([
                   dbc.Label('Pipeline processing time (in hours)', 
-                            width=labelWidth),
+                            width=labelWidth, id='pipeProcTimeRowL'),
                   dbc.Col(
                      dbc.Input(type='text', id='pipeProcTimeRow', value='',
                                disabled=True
