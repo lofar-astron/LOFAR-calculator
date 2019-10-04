@@ -146,11 +146,15 @@ hbaDual = dbc.FormGroup([
 buttons = html.Div([
             dbc.Row([
                 dbc.Col(dbc.Button('Calculate', id='calculate', color='dark')),
-                dbc.Col(dbc.Button('Reset inputs', id='reset', color='dark'))
+                dbc.Col(dbc.Button('Reset inputs', id='reset', color='dark')),
+                dbc.Col(dbc.Button('Generate PDF', id='genpdf', color='dark'))
             ])
           ])
+link = html.Div([
+          html.A(id='download-link', children='Download file')
+       ])
 obsGUISetup = dbc.Form([obsTime, Ncore, Nremote, Nint, Nchan, 
-                        Nsb, intTime, hbaDual, buttons])
+                        Nsb, intTime, hbaDual, buttons, link])
 obsGUIFrame = html.Div(children=[
                 html.H3('Observational setup'),
                 html.Hr(),

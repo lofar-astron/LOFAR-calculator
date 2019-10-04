@@ -12,6 +12,7 @@ from gui import header, obsGUIFrame, pipeGUIFrame, resultGUIFrame
 from gui import defaultParams, msgBoxObsT, msgBoxnSB, msgBoxIntT, msgBox
 import backend as bk
 import targetvis as tv
+import os
 
 # Initialize the dash app
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LUMEN])
@@ -222,22 +223,18 @@ def validate_tAvg(n_blur, n_clicks, value, is_open):
 # What should the resolve button do?
 #######################################
 @app.callback(
-   [
-      Output('coordRow', 'value'),
+   [  Output('coordRow', 'value'),
       Output('msgboxResolve', 'is_open')
    ],
-   [
-      Input('resolve', 'n_clicks'),
+   [  Input('resolve', 'n_clicks'),
       Input('mbResolveClose', 'n_clicks')
    ],
-   [
-      State('targetNameRow', 'value'),
+   [  State('targetNameRow', 'value'),
       State('msgboxResolve', 'is_open')
    ]
 )
 def on_resolve_click(n, closeMsgBox, targetName, is_open):
    """Function defines what to do when the resolve button is clicked"""
-   print('LINE EXECUTED')
    if is_open is True and closeMsgBox is not None:
       # The message box is open and the user has clicked the close
       # button. Close the alert message
@@ -255,11 +252,32 @@ def on_resolve_click(n, closeMsgBox, targetName, is_open):
          return coord_str, False
 
 #######################################
+# What should the export button do?
+#######################################
+@app.callback(
+   [  Output('download-link', 'style'),
+      Output('download-link', 'href')
+   ],
+   [  Input('genpdf', 'n_clicks') ]
+)
+def on_genpdf_click(n_clicks):
+   """Function defines what to do when the generate pdf button is clicked"""
+   if n_clicks is None:
+      # Generate button has not been clicked. Hide the download link
+      return {'display':'none'}, ''
+   else:
+      relPath = os.path.join('static', 'sample.txt')
+      absPath = os.path.join(os.getcwd(), relPath)
+      f = open(relPath, 'w')
+      f.write('This is dummy text')
+      f.close()
+      return {'display':'block'}, relPath
+
+#######################################
 # What should the reset button do?
 #######################################
 @app.callback(
-    [
-       Output('obsTimeRow', 'value'),
+    [  Output('obsTimeRow', 'value'),
        Output('nCoreRow',   'value'),
        Output('nRemoteRow','value'),
        Output('nIntRow','value'),
@@ -290,32 +308,29 @@ def on_reset_click(n):
 # What should the submit button do?
 #######################################
 @app.callback(
-    [
-        Output('imNoiseRow','value'),
-        Output('rawSizeRow','value'),
-        Output('pipeSizeRow','value'),
-        Output('pipeProcTimeRow','value'),
-        Output('msgBoxBody', 'children'),
-        Output('msgbox', 'is_open')
+    [  Output('imNoiseRow','value'),
+       Output('rawSizeRow','value'),
+       Output('pipeSizeRow','value'),
+       Output('pipeProcTimeRow','value'),
+       Output('msgBoxBody', 'children'),
+       Output('msgbox', 'is_open')
     ],
-    [ 
-       Input('calculate','n_clicks'), 
+    [  Input('calculate','n_clicks'), 
        Input('msgBoxClose', 'n_clicks')
     ],
-    [
-        State('obsTimeRow','value'),
-        State('nCoreRow','value'),
-        State('nRemoteRow','value'),
-        State('nIntRow','value'),
-        State('nChanRow','value'),
-        State('nSbRow','value'),
-        State('intTimeRow','value'),
-        State('hbaDualRow','value'),
-        State('pipeTypeRow','value'),
-        State('tAvgRow','value'),
-        State('fAvgRow','value'),
-        State('dyCompressRow','value'),
-        State('msgbox', 'is_open')
+    [  State('obsTimeRow','value'),
+       State('nCoreRow','value'),
+       State('nRemoteRow','value'),
+       State('nIntRow','value'),
+       State('nChanRow','value'),
+       State('nSbRow','value'),
+       State('intTimeRow','value'),
+       State('hbaDualRow','value'),
+       State('pipeTypeRow','value'),
+       State('tAvgRow','value'),
+       State('fAvgRow','value'),
+       State('dyCompressRow','value'),
+       State('msgbox', 'is_open')
     ]
 )
 def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB, 
