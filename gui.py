@@ -237,7 +237,8 @@ targetCoord = dbc.FormGroup([
 obsDate = dbc.FormGroup([
              dbc.Label('Observation date', width=labelWidth-inpWidth),
              dbc.Col(dcc.DatePickerSingle(date=date.today(), 
-                                          display_format='DD/MM/YYYY')
+                                          display_format='DD/MM/YYYY',
+                                          id='dateRow')
              )
           ], row=True)
 targetGUISetup = dbc.Form([targetName, targetCoord, obsDate])

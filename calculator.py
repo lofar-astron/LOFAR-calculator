@@ -370,7 +370,7 @@ def on_reset_click(n):
        Output('elevation-plot', 'figure')
     ],
     [  Input('calculate','n_clicks'), 
-       Input('msgBoxClose', 'n_clicks')
+       Input('msgBoxClose', 'n_clicks'),
     ],
     [  State('obsTimeRow','value'),
        State('nCoreRow','value'),
@@ -384,11 +384,14 @@ def on_reset_click(n):
        State('tAvgRow','value'),
        State('fAvgRow','value'),
        State('dyCompressRow','value'),
-       State('msgbox', 'is_open')
+       State('msgbox', 'is_open'),
+       State('coordRow', 'value'),
+       State('dateRow', 'date')
     ]
 )
 def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB, 
-                       integT, hbaMode, pipeType, tAvg, fAvg, dyCompress, is_open):
+                       integT, hbaMode, pipeType, tAvg, fAvg, dyCompress, 
+                       is_open, coord, obsDate):
     """Function defines what to do when the calculate button is clicked"""
     if is_open is True:
        # User has closed the error message box
@@ -415,8 +418,11 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
            avgSize = bk.calculate_proc_size(float(obsT), float(integT), nBaselines,
                                             int(nChan), int(nSB), pipeType, 
                                             int(tAvg), int(fAvg), dyCompress)
+           # Find target elevation across a 24-hour period
+           xaxis, yaxis = tv.findTargetElevation(coord, obsDate)
            plotFig = {'data':[{ 'type':'scatter',
-                                'y': [1,2,3]
+                                'x': xaxis,
+                                'y': yaxis
                              }],
                       'layout':go.Layout(
                                  xaxis={'title':'Time (UTC)'},
