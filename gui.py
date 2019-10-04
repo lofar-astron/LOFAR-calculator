@@ -50,6 +50,14 @@ msgBoxResolve = dbc.Modal([
                                         dbc.Button('Close', id='mbResolveClose')
                                         )
                          ], id='msgboxResolve', centered=True)
+msgBoxGenPdf = dbc.Modal([
+                         dbc.ModalHeader(modalHeader),
+                         dbc.ModalBody('Nothing to generate. Please use the ' + \
+                                       'calculate button before exporting to PDF'),
+                         dbc.ModalFooter(
+                                        dbc.Button('Close', id='mbGenPdfClose')
+                                        )
+                         ], id='msgboxGenPdf', centered=True)
 msgBox = dbc.Modal([
                       dbc.ModalHeader(modalHeader),
                       dbc.ModalBody('', id='msgBoxBody'),
@@ -303,5 +311,5 @@ layout = html.Div([
                                 dbc.Col(resultGUIFrame)
                      ]),
                      msgBoxObsT, msgBoxnSB, msgBoxIntT, msgBoxTAvg, msgBoxFAvg,
-                     msgBoxResolve, msgBox
+                     msgBoxResolve, msgBoxGenPdf, msgBox
                   ])

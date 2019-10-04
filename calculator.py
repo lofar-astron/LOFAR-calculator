@@ -256,22 +256,36 @@ def on_resolve_click(n, closeMsgBox, targetName, is_open):
 #######################################
 @app.callback(
    [  Output('download-link', 'style'),
-      Output('download-link', 'href')
+      Output('download-link', 'href'),
+      Output('msgboxGenPdf', 'is_open')
    ],
-   [  Input('genpdf', 'n_clicks') ]
+   [  Input('genpdf', 'n_clicks'),
+      Input('mbGenPdfClose', 'n_clicks')
+   ],
+   [  State('imNoiseRow','value'),
+      State('msgboxGenPdf', 'is_open')
+   ]
 )
-def on_genpdf_click(n_clicks):
+def on_genpdf_click(n_clicks, closeMsgBox, imNoiseVal, isMsgBoxOpen):
    """Function defines what to do when the generate pdf button is clicked"""
+   if isMsgBoxOpen is True and closeMsgBox is not None:
+      # The message box is open and the user has clicked the close
+      # button. Close the alert message.
+      return {'display':'none'}, '', False
    if n_clicks is None:
       # Generate button has not been clicked. Hide the download link
-      return {'display':'none'}, ''
+      return {'display':'none'}, '', False
    else:
-      relPath = os.path.join('static', 'sample.txt')
-      absPath = os.path.join(os.getcwd(), relPath)
-      f = open(relPath, 'w')
-      f.write('This is dummy text')
-      f.close()
-      return {'display':'block'}, relPath
+      if imNoiseVal is '':
+         # User has clicked generate PDF button before calculate
+         return {'display':'none'}, '', True
+      else:
+         relPath = os.path.join('static', 'sample.txt')
+         absPath = os.path.join(os.getcwd(), relPath)
+         f = open(relPath, 'w')
+         f.write('This is dummy text')
+         f.close()
+         return {'display':'block'}, relPath, False
 
 #######################################
 # What should the reset button do?
