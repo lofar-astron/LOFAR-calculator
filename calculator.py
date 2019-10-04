@@ -12,7 +12,9 @@ from gui import header, obsGUIFrame, pipeGUIFrame, resultGUIFrame
 from gui import defaultParams, msgBoxObsT, msgBoxnSB, msgBoxIntT, msgBox
 import backend as bk
 import targetvis as tv
+import generatepdf as g
 import os
+from random import randint
 
 # Initialize the dash app
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LUMEN])
@@ -262,11 +264,31 @@ def on_resolve_click(n, closeMsgBox, targetName, is_open):
    [  Input('genpdf', 'n_clicks'),
       Input('mbGenPdfClose', 'n_clicks')
    ],
-   [  State('imNoiseRow','value'),
+   [  State('obsTimeRow', 'value'),
+      State('nCoreRow',   'value'),
+      State('nRemoteRow','value'),
+      State('nIntRow','value'),
+      State('nChanRow','value'),
+      State('nSbRow','value'),
+      State('intTimeRow','value'),
+      State('hbaDualRow', 'value'),
+      
+      State('pipeTypeRow','value'),
+      State('tAvgRow','value'),
+      State('fAvgRow','value'),
+      State('dyCompressRow','value'),
+      
+      State('imNoiseRow','value'),
+      State('rawSizeRow', 'value'),
+      State('pipeSizeRow', 'value'),
+      State('pipeProcTimeRow', 'value'),
+      
       State('msgboxGenPdf', 'is_open')
    ]
 )
-def on_genpdf_click(n_clicks, closeMsgBox, imNoiseVal, isMsgBoxOpen):
+def on_genpdf_click(n_clicks, closeMsgBox, obsT, nCore, nRemote, nInt, nChan,
+                    nSb, integT, antSet, pipeType, tAvg, fAvg, isDysco, 
+                    imNoiseVal, rawSize, procSize, pipeTime, isMsgBoxOpen):
    """Function defines what to do when the generate pdf button is clicked"""
    if isMsgBoxOpen is True and closeMsgBox is not None:
       # The message box is open and the user has clicked the close
@@ -280,11 +302,18 @@ def on_genpdf_click(n_clicks, closeMsgBox, imNoiseVal, isMsgBoxOpen):
          # User has clicked generate PDF button before calculate
          return {'display':'none'}, '', True
       else:
-         relPath = os.path.join('static', 'sample.txt')
+         # Generate a random number so that this user's pdf can be stored here 
+         randnum = '{:04d}'.format(randint(0,1000))
+         relPath = os.path.join('static', randnum)
+         # Create this folder
          absPath = os.path.join(os.getcwd(), relPath)
-         f = open(relPath, 'w')
-         f.write('This is dummy text')
-         f.close()
+         os.mkdir(absPath)
+         # Generate a relative and absolute filenames to the pdf file
+         relPath = os.path.join(relPath, 'summary.pdf')
+         absPath = os.path.join(os.getcwd(), relPath)
+         g.generatepdf(relPath, obsT, nCore, nRemote, nInt, nChan,
+                    nSb, integT, antSet, pipeType, tAvg, fAvg, isDysco, 
+                    imNoiseVal, rawSize, procSize, pipeTime, isMsgBoxOpen)
          return {'display':'block'}, relPath, False
 
 #######################################
