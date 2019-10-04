@@ -1,5 +1,6 @@
 from fpdf import FPDF, HTMLMixin
 
+# Dummy class needed to generate the PDF file
 class MyFPDF(FPDF, HTMLMixin): pass
 
 def generatepdf(pdffile, obsT, nCore, nRemote, nInt, nChan, nSb, integT, 
