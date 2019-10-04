@@ -1,3 +1,5 @@
+import numpy as np
+
 def compute_baselines(nCore, nRemote, nInt, hbaMode):
    """For a given number of core, remote, and international stations
       and the HBA mode, compute the number of baselines formed by 
@@ -7,6 +9,46 @@ def compute_baselines(nCore, nRemote, nInt, hbaMode):
    else:
       nStations = nCore+nRemote+nInt
    return (nStations*(nStations+1))/2
+
+def calculate_im_noise(nCore, nRemote, nInt, hbaMode, obsT, nSB):
+   # Hardcoded value for subband width 
+   sbWidth = 195.3125 # kHz
+   
+   # Hardcoded values for station SEFD
+   coresefd   = { 'lba' : 38160, 'hba' : 2820 }
+   remotesefd = { 'lba' : 38160, 'hba' : 1410 }
+   intsefd    = { 'lba' : 18840, 'hba' : 710  }
+   
+   # Guess whether the user wants to observe with LBA or HBA.
+   if hbaMode == 'enable':
+      mode = 'hba'
+      nCore *= 2
+   else:
+      mode = 'lba'
+   
+   # Calculate the bandwidth in MHz
+   bandwidth = nSB * sbWidth * 1.E3
+   bandwidth /= 1.E6
+   
+   # Calculate the sensitivity
+   prodcc = coresefd[mode]
+   prodrr = remotesefd[mode]
+   prodii = intsefd[mode]
+   prodcr = np.sqrt(prodcc) * np.sqrt(prodrr)
+   prodci = np.sqrt(prodcc) * np.sqrt(prodii)
+   prodri = np.sqrt(prodrr) * np.sqrt(prodii)
+   nccbl = nCore*(nCore-1)/2
+   nrrbl = nRemote*(nRemote-1)/2
+   niibl = nInt*(nInt-1)/2
+   ncrbl = nCore * nRemote
+   ncibl = nCore * nInt
+   nribl = nRemote * nInt
+   denom = 4 * bandwidth * obsT * 1.E6 * ( (nccbl/prodcc**2) + (nrrbl/prodrr**2) + \
+                                         (niibl/prodii**2) + (ncrbl/prodcr**2) + \
+                                         (ncibl/prodci**2) + (nribl/prodri**2) )
+   imNoise = 1/np.sqrt(denom)
+   imNoise *= 1.E6 # In uJy
+   return '{:0.2f}'.format(imNoise)
 
 def calculate_raw_size(obsT, intTime, nBaselines, nChan, nSB):
    """Compute the datasize of a raw LOFAR measurement set given the 
@@ -19,7 +61,7 @@ def calculate_raw_size(obsT, intTime, nBaselines, nChan, nSB):
    #    - 4*nChan*2*float data array (4*nChan*2*4 bytes)
    sbSize = nRows * ((4) + (2*nChan) + (4*nChan*2*4))/(1024*1024*1024) # in GB
    totSize = sbSize * nSB
-   return totSize
+   return '{:0.2f}'.format(totSize)
 
 def calculate_proc_size(obsT, intTime, nBaselines, nChan, nSB, pipeType, tAvg, 
                         fAvg, dyCompress):
@@ -45,7 +87,7 @@ def calculate_proc_size(obsT, intTime, nBaselines, nChan, nSB, pipeType, tAvg,
       # Convert byte length to GB
       sbSize /= (1024*1024*1024)
       totSize = sbSize * nSB
-      return totSize
+      return '{:0.2f}'.format(totSize)
    else:
       pass
 

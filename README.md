@@ -2,4 +2,4 @@
 Data size and processing time calculator for LOFAR
 
 Dependency installations:
-pip install dash dash-bootstrap-components
+pip install dash dash-bootstrap-components numpy astroquery astropy

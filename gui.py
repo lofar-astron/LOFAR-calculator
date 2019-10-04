@@ -1,6 +1,7 @@
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
+from datetime import date 
 
 ###############################################################################
 # Define a modal to display error messages for observation time
@@ -41,6 +42,14 @@ msgBoxFAvg = dbc.Modal([
                                         dbc.Button('Close', id='mbfAvgClose')
                                         )
                        ], id='msgboxFAvg', centered=True)
+msgBoxResolve = dbc.Modal([
+                         dbc.ModalHeader(modalHeader),
+                         dbc.ModalBody('Unable to resolve the source name. Please ' + \
+                                       'specify the coordinates manually.'),
+                         dbc.ModalFooter(
+                                        dbc.Button('Close', id='mbResolveClose')
+                                        )
+                         ], id='msgboxResolve', centered=True)
 msgBox = dbc.Modal([
                       dbc.ModalHeader(modalHeader),
                       dbc.ModalBody('', id='msgBoxBody'),
@@ -58,6 +67,8 @@ defaultParams = {'obsTime':'28800', 'Ncore':'24', 'Nremote':'14',
                  
                  'pipeType':'none', 'tAvg':'1', 'fAvg':'1', 
                  'dyCompress':'enable',
+                 
+                 'targetName':'', 'target_coord':'',
                 }
 
 ###############################################################################
@@ -195,10 +206,36 @@ dyCompress = dbc.FormGroup([
                 )
              ], row=True)
 pipeGUISetup = dbc.Form([pipeType, tAvg, fAvg, dyCompress])
+targetName = dbc.FormGroup([
+                dbc.Label('Target', width=labelWidth-inpWidth, 
+                          id='targetNameRowL'
+                ),
+                dbc.Col(
+                   dbc.Input(id='targetNameRow', min=0), 
+                   width=inpWidth
+                ),
+                dbc.Col(
+                   dbc.Button('Resolve', id='resolve', color='dark')
+                )
+             ], row=True)
+targetCoord = dbc.FormGroup([
+                 dbc.Label('Coordinates', width=labelWidth-inpWidth),
+                 dbc.Col(dbc.Input(id='coordRow'), width=inpWidth*2)                    
+              ], row=True)
+obsDate = dbc.FormGroup([
+             dbc.Label('Observation date', width=labelWidth-inpWidth),
+             dbc.Col(dcc.DatePickerSingle(date=date.today(), 
+                                          display_format='DD/MM/YYYY')
+             )
+          ], row=True)
+targetGUISetup = dbc.Form([targetName, targetCoord, obsDate])
 pipeGUIFrame = html.Div(children=[
                 html.H3('Pipeline setup'),
                 html.Hr(),
-                pipeGUISetup
+                pipeGUISetup,
+                html.H3('Target visibility'),
+                html.Hr(),
+                targetGUISetup
                ], style={'width':'95%', 'padding':'20px'})
 
 ###############################################################################
@@ -262,5 +299,5 @@ layout = html.Div([
                                 dbc.Col(resultGUIFrame)
                      ]),
                      msgBoxObsT, msgBoxnSB, msgBoxIntT, msgBoxTAvg, msgBoxFAvg,
-                     msgBox
+                     msgBoxResolve, msgBox
                   ])

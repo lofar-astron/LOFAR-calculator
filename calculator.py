@@ -11,6 +11,7 @@ from gui import layout
 from gui import header, obsGUIFrame, pipeGUIFrame, resultGUIFrame
 from gui import defaultParams, msgBoxObsT, msgBoxnSB, msgBoxIntT, msgBox
 import backend as bk
+import targetvis as tv
 
 # Initialize the dash app
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LUMEN])
@@ -46,8 +47,7 @@ def toggle_pipeline(value):
         return {'display':'none'}, {'display':'none'}, \
                {'display':'none'}, {'display':'none'}, \
                {'display':'none'}, {'display':'none'}
-    elif value == 'preprocessing' or value=='prefactor':
-        #style['display'] = 'block'
+    elif value == 'preprocessing':
         return {'display':'block'}, {'display':'block'}, \
                {'display':'block'}, {'display':'block'}, \
                {'display':'block'}, {'display':'block'}
@@ -219,6 +219,42 @@ def validate_tAvg(n_blur, n_clicks, value, is_open):
       return False
 
 #######################################
+# What should the resolve button do?
+#######################################
+@app.callback(
+   [
+      Output('coordRow', 'value'),
+      Output('msgboxResolve', 'is_open')
+   ],
+   [
+      Input('resolve', 'n_clicks'),
+      Input('mbResolveClose', 'n_clicks')
+   ],
+   [
+      State('targetNameRow', 'value'),
+      State('msgboxResolve', 'is_open')
+   ]
+)
+def on_resolve_click(n, closeMsgBox, targetName, is_open):
+   """Function defines what to do when the resolve button is clicked"""
+   print('LINE EXECUTED')
+   if is_open is True and closeMsgBox is not None:
+      # The message box is open and the user has clicked the close
+      # button. Close the alert message
+      return '', False
+   if n is None:
+      # The page has just loaded.
+      return '', False
+   else:
+      # Resole button has been clicked
+      coord_str = tv.resolve_source(targetName)
+      if coord_str is None:
+         # Display error message. 
+         return '', True
+      else:
+         return coord_str, False
+
+#######################################
 # What should the reset button do?
 #######################################
 @app.callback(
@@ -236,7 +272,8 @@ def validate_tAvg(n_blur, n_clicks, value, is_open):
        
        Output('hbaDualRow','value'),
        Output('pipeTypeRow','value'),
-       Output('dyCompressRow','value')
+       Output('dyCompressRow','value'),
+
     ],
     [Input('reset', 'n_clicks')]
 )
