@@ -1,6 +1,7 @@
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
+import plotly.graph_objs as go
 from datetime import date 
 
 ###############################################################################
@@ -245,7 +246,7 @@ pipeGUIFrame = html.Div(children=[
                 html.H3('Pipeline setup'),
                 html.Hr(),
                 pipeGUISetup,
-                html.H3('Target visibility'),
+                html.H3('Target setup'),
                 html.Hr(),
                 targetGUISetup
                ], style={'width':'95%', 'padding':'20px'})
@@ -300,7 +301,18 @@ resultGUIFrame = html.Div(children=[
                     html.Hr(),
                     resultGUISetup
                  ], style={'width':'95%', 'padding':'20px'})
-                 
+
+###############################################################################
+# Layout of the graph
+###############################################################################
+graph = dbc.Row(dbc.Col(
+           html.Div([ 
+               dcc.Graph(id='elevation-plot', 
+                         figure={'layout':{'title':'Target visibility plot'}}
+               )
+           ])
+        ), id='graphRow', style={'width':'66%'})
+
 ###############################################################################
 # Define the layout of the calculator
 ###############################################################################
@@ -311,6 +323,8 @@ layout = html.Div([
                                 dbc.Col(pipeGUIFrame),
                                 dbc.Col(resultGUIFrame)
                      ]),
+                     graph,
+                     
                      msgBoxObsT, msgBoxnSB, msgBoxIntT, msgBoxTAvg, msgBoxFAvg,
                      msgBoxResolve, msgBoxGenPdf, msgBox
                   ])

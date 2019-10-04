@@ -341,7 +341,7 @@ def on_genpdf_click(n_clicks, closeMsgBox, obsT, nCore, nRemote, nInt, nChan,
        
        Output('hbaDualRow','value'),
        Output('pipeTypeRow','value'),
-       Output('dyCompressRow','value'),
+       Output('dyCompressRow','value')
 
     ],
     [Input('reset', 'n_clicks')]
@@ -364,7 +364,8 @@ def on_reset_click(n):
        Output('pipeSizeRow','value'),
        Output('pipeProcTimeRow','value'),
        Output('msgBoxBody', 'children'),
-       Output('msgbox', 'is_open')
+       Output('msgbox', 'is_open'),
+       Output('graphRow', 'style')
     ],
     [  Input('calculate','n_clicks'), 
        Input('msgBoxClose', 'n_clicks')
@@ -389,18 +390,18 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
     """Function defines what to do when the calculate button is clicked"""
     if is_open is True:
        # User has closed the error message box
-       return '', '', '', '', '', False
+       return '', '', '', '', '', False, {'display':'none'}
     if n is None:
         # Calculate button has not been clicked yet
         # So, do nothing and set default values to results field
-        return '', '', '', '', '', False
+        return '', '', '', '', '', False, {'display':'none'}
     else:
         # Calculate button has been clicked.
         # First, validate all command line inputs
         status, msg = bk.validate_inputs(obsT, nSB, integT, tAvg, fAvg)
         if status is False:
            print(msg)
-           return '', '', '', '', msg, True
+           return '', '', '', '', msg, True, {'display':'none'}
         else:
            # Estimate the raw data size
            nBaselines = bk.compute_baselines(int(nCore), int(nRemote), 
@@ -412,7 +413,8 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
            avgSize = bk.calculate_proc_size(float(obsT), float(integT), nBaselines,
                                             int(nChan), int(nSB), pipeType, 
                                             int(tAvg), int(fAvg), dyCompress)
-           return imNoise, rawSize, avgSize, 0, '', False
+           return imNoise, rawSize, avgSize, 0, '', \
+                  False, {'display':'block'}
 
 if __name__ == '__main__':
     app.run_server(debug=True)
