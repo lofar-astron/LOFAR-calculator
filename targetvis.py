@@ -3,7 +3,7 @@ from astropy.coordinates import SkyCoord
 from astropy import units as u
 from datetime import datetime, timedelta
 from ephem import Observer, FixedBody, degrees
-import numpy as np
+import numpy as np      
 
 def resolve_source(name):
    """For a given source name, use astroquery to find its coordinates"""
@@ -41,7 +41,10 @@ def findTargetElevation(coord, obsDate):
    # Create a target object
    target = FixedBody()
    target._epoch = '2000'
-   coordTarget = SkyCoord(coord)
+   try:
+      coordTarget = SkyCoord(coord)
+   except:
+      return None, None
    target._ra = coordTarget.ra.radian
    target._dec= coordTarget.dec.radian
    

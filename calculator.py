@@ -403,7 +403,7 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
     else:
         # Calculate button has been clicked.
         # First, validate all command line inputs
-        status, msg = bk.validate_inputs(obsT, nSB, integT, tAvg, fAvg)
+        status, msg = bk.validate_inputs(obsT, nSB, integT, tAvg, fAvg, coord)
         if status is False:
            print(msg)
            return '', '', '', '', msg, True, {'display':'none'}, {}
@@ -418,19 +418,29 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
            avgSize = bk.calculate_proc_size(float(obsT), float(integT), nBaselines,
                                             int(nChan), int(nSB), pipeType, 
                                             int(tAvg), int(fAvg), dyCompress)
-           # Find target elevation across a 24-hour period
-           xaxis, yaxis = tv.findTargetElevation(coord, obsDate)
-           plotFig = {'data':[{ 'type':'scatter',
-                                'x': xaxis,
-                                'y': yaxis
-                             }],
-                      'layout':go.Layout(
-                                 xaxis={'title':'Time (UTC)'},
-                                 yaxis={'title':'Elevation'}
-                               )
-                     }
+           if coord is '':
+              # No source is specified under Target setup
+              displayFig = {'display':'none'}
+              plotFig = {}
+           else:
+              # User has specified a coordinate and it has passed validation
+              # in the validate_inputs function.
+              # Find target elevation across a 24-hour period
+              xaxis, yaxis = tv.findTargetElevation(coord, obsDate)
+              # If xaxis is None, the user specified coordinates are wrong. 
+              # Show error message
+              displayFig = {'display':'block'}
+              plotFig = {'data':[{ 'type':'scatter',
+                                   'x': xaxis,
+                                   'y': yaxis
+                                }],
+                         'layout':go.Layout(
+                                    xaxis={'title':'Time (UTC)'},
+                                    yaxis={'title':'Elevation'}
+                                  )
+                        }
            return imNoise, rawSize, avgSize, 0, '', \
-                  False, {'display':'block'}, plotFig
+                  False, displayFig, plotFig
 
 if __name__ == '__main__':
     app.run_server(debug=True)

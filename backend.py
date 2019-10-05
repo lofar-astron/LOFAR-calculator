@@ -1,10 +1,11 @@
 import numpy as np
+from astropy.coordinates import SkyCoord
 
 def compute_baselines(nCore, nRemote, nInt, hbaMode):
    """For a given number of core, remote, and international stations
       and the HBA mode, compute the number of baselines formed by 
       the array. The number of baselines includes autocorrelations."""
-   if hbaMode == 'enable':
+   if 'hba' in hbaMode:
       nStations = (2*nCore)+nRemote+nInt
    else:
       nStations = nCore+nRemote+nInt
@@ -20,7 +21,7 @@ def calculate_im_noise(nCore, nRemote, nInt, hbaMode, obsT, nSB):
    intsefd    = { 'lba' : 18840, 'hba' : 710  }
    
    # Guess whether the user wants to observe with LBA or HBA.
-   if hbaMode == 'enable':
+   if 'hba' in hbaMode:
       mode = 'hba'
       nCore *= 2
    else:
@@ -32,7 +33,11 @@ def calculate_im_noise(nCore, nRemote, nInt, hbaMode, obsT, nSB):
    
    # Calculate the sensitivity
    prodcc = coresefd[mode]
-   prodrr = remotesefd[mode]
+   if hbaMode == 'hbadualinner':
+      # SEFD of the tapered remote station is the same as a core station
+      prodrr = coresefd[mode]
+   else:
+      prodrr = remotesefd[mode]
    prodii = intsefd[mode]
    prodcr = np.sqrt(prodcc) * np.sqrt(prodrr)
    prodci = np.sqrt(prodcc) * np.sqrt(prodii)
@@ -91,7 +96,7 @@ def calculate_proc_size(obsT, intTime, nBaselines, nChan, nSB, pipeType, tAvg,
    else:
       pass
 
-def validate_inputs(obsT, nSB, integT, tAvg, fAvg):
+def validate_inputs(obsT, nSB, integT, tAvg, fAvg, coord):
    """Valid text input supplied by the user: observation time, number of 
       subbands, and integration time. Following checks will be performed:
          - obsTime is a valid positive number
@@ -99,6 +104,7 @@ def validate_inputs(obsT, nSB, integT, tAvg, fAvg):
          - integT is a valid positive number
          - tAvg is an integer
          - fAvg is an integer
+         - coord is a valid AstroPy coordinate
       Return state=True/False accompanied by an error msg
       Note: all input parameters are still strings."""
    msg = ''
@@ -133,6 +139,13 @@ def validate_inputs(obsT, nSB, integT, tAvg, fAvg):
       int(str(fAvg))
    except ValueError:
       msg += 'Invalid frequency averaging factor specified.'
+   # Validate the coordinates specified under target setup
+   if coord is not '':
+      try:
+         SkyCoord(coord)
+      except:
+         msg += 'Invalid coodinate value under Target setup. Please make ' +\
+                'sure it is compatible with the AstroPy formats.'
    # If any error has been triggered above, return the error message
    if msg is not '':
       return False, msg

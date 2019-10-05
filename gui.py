@@ -71,7 +71,7 @@ msgBox = dbc.Modal([
 ###############################################################################
 defaultParams = {'obsTime':'28800', 'Ncore':'24', 'Nremote':'14',
                  'Nint':'13', 'Nchan':'64', 'Nsb':'488',
-                 'intTime':'1', 'hbaDual':'disable',
+                 'intTime':'1', 'hbaDual':'hbadualinner',
                  
                  'pipeType':'none', 'tAvg':'1', 'fAvg':'1', 
                  'dyCompress':'enable',
@@ -140,13 +140,14 @@ intTime = dbc.FormGroup([
             )
         ], row=True)
 hbaDual = dbc.FormGroup([
-            dbc.Label('Observe in HBA Dual mode?', width=labelWidth),
+            dbc.Label('Antenna set', width=labelWidth),
             dbc.Col(
                 dcc.Dropdown(
                     options=[
-                        {'label':'Disable', 'value':'disable'},
-                        {'label':'Enable', 'value':'enable'}
-                    ], value='disable', searchable=False, 
+                        {'label':'LBA Outer', 'value':'lbaouter'},
+                        {'label':'HBA Dual', 'value':'hbadual'},
+                        {'label':'HBA Dual Inner', 'value':'hbadualinner'}
+                    ], value='hbadualinner', searchable=False, 
                        clearable=False, id='hbaDualRow',
                 ), width=dropWidth
             )
