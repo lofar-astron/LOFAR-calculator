@@ -436,7 +436,8 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
                                 }],
                          'layout':go.Layout(
                                     xaxis={'title':'Time (UTC)'},
-                                    yaxis={'title':'Elevation'}
+                                    yaxis={'title':'Elevation'},
+                                    title='Target visibility plot'
                                   )
                         }
            return imNoise, rawSize, avgSize, 0, '', \

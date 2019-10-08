@@ -242,14 +242,27 @@ obsDate = dbc.FormGroup([
                                           id='dateRow')
              )
           ], row=True)
-targetGUISetup = dbc.Form([targetName, targetCoord, obsDate])
+calList = dbc.FormGroup([
+             dbc.Label('Calibrators', width=labelWidth-inpWidth),
+             dbc.Col(dcc.Dropdown(
+                        options=[
+                             {'label':'3C48', 'value':'3C38'},
+                             {'label':'3C147', 'value':'3C147'},
+                             {'label':'3C196', 'value':'3C196'},
+                             {'label':'3C295', 'value':'3C295'}
+                        ], searchable=True, clearable=True, 
+                           id='calListRow', multi=True
+                     ), width=dropWidth
+             )
+          ], row=True)
+targetGUISetup = dbc.Form([targetName, targetCoord, obsDate, calList])
 pipeGUIFrame = html.Div(children=[
+                html.H3('Target setup'),
+                html.Hr(),
+                targetGUISetup,
                 html.H3('Pipeline setup'),
                 html.Hr(),
                 pipeGUISetup,
-                html.H3('Target setup'),
-                html.Hr(),
-                targetGUISetup
                ], style={'width':'95%', 'padding':'20px'})
 
 ###############################################################################
