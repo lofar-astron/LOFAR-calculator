@@ -6,6 +6,14 @@ from ephem import Observer, FixedBody, degrees
 import numpy as np      
 from plotly.graph_objs import Scatter, Data
 
+# Define coordinates of calibrators
+calib_coordinates = {
+                       '3C48' :'01h37m41.2994s +33d09m35.134s',
+                       '3C196':'08h13m36.033s +48d13m02.56s',
+                       '3C295':'14h11m20.519s +52d12m09.97s',
+                       '3C147':'05h42m36.1379s +49d51m07.234s' 
+                    }
+
 def resolve_source(names):
    """For a given source name, use astroquery to find its coordinates.
       The source name can be a single source or a comma separated list."""

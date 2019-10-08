@@ -387,12 +387,13 @@ def on_reset_click(n):
        State('msgbox', 'is_open'),
        State('targetNameRow', 'value'),
        State('coordRow', 'value'),
-       State('dateRow', 'date')
+       State('dateRow', 'date'),
+       State('calListRow', 'value')
     ]
 )
 def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB, 
                        integT, hbaMode, pipeType, tAvg, fAvg, dyCompress, 
-                       is_open, srcName, coord, obsDate):
+                       is_open, srcName, coord, obsDate, calibNames):
     """Function defines what to do when the calculate button is clicked"""
     if is_open is True:
        # User has closed the error message box
@@ -420,6 +421,13 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
            avgSize = bk.calculate_proc_size(float(obsT), float(integT), nBaselines,
                                             int(nChan), int(nSB), pipeType, 
                                             int(tAvg), int(fAvg), dyCompress)
+           # Add calibrator names to the target list so that they can be 
+           # plotted together
+           for i in range(len(calibNames)):
+              srcName += ', {}'.format( calibNames[i] )
+              coord.append( tv.calib_coordinates[calibNames[i]] )
+           print(srcName)
+           print(coord)
            if coord is '':
               # No source is specified under Target setup
               displayFig = {'display':'none'}
@@ -429,8 +437,6 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
               # in the validate_inputs function.
               # Find target elevation across a 24-hour period
               data = tv.findTargetElevation(srcName, coord, obsDate)
-              # If xaxis is None, the user specified coordinates are wrong. 
-              # Show error message
               displayFig = {'display':'block'}
               plotFig = {'data':data,
                          'layout':go.Layout(
