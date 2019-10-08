@@ -142,7 +142,8 @@ def validate_inputs(obsT, nSB, integT, tAvg, fAvg, coord):
    # Validate the coordinates specified under target setup
    if coord is not '':
       try:
-         SkyCoord(coord)
+         for i in range(len(coord)):
+            SkyCoord(coord[i])
       except:
          msg += 'Invalid coodinate value under Target setup. Please make ' +\
                 'sure it is compatible with the AstroPy formats.'

@@ -10,26 +10,14 @@ def resolve_source(names):
       The source name can be a single source or a comma separated list."""
    retString = []
    try:
-      if ',' in names:
-         # The user has entered multiple sources
-         nSources = len(names.split(','))
-         print()
-         for name in names.split(','):
-            query = Simbad.query_object(name)
-            ra = query['RA'][0]
-            dec= query['DEC'][0]
-            coord = SkyCoord('{} {}'.format(ra, dec), unit=(u.hourangle, u.deg))
-            retString.append( coord.to_string('hmsdms') )
-      else:
-         # User has entered only one source
-         query = Simbad.query_object(names)
+      for name in names.split(','):
+         query = Simbad.query_object(name)
          ra = query['RA'][0]
          dec= query['DEC'][0]
          coord = SkyCoord('{} {}'.format(ra, dec), unit=(u.hourangle, u.deg))
          retString.append( coord.to_string('hmsdms') )
    except:
       return None
-   print(retString)
    return retString
 
 def findTargetElevation(coord, obsDate):
