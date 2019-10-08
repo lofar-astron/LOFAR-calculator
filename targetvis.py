@@ -4,6 +4,7 @@ from astropy import units as u
 from datetime import datetime, timedelta
 from ephem import Observer, FixedBody, degrees
 import numpy as np      
+from plotly.graph_objs import Scatter, Data
 
 def resolve_source(names):
    """For a given source name, use astroquery to find its coordinates.
@@ -20,7 +21,7 @@ def resolve_source(names):
       return None
    return retString
 
-def findTargetElevation(coord, obsDate):
+def findTargetElevation(srcName, coord, obsDate):
    """For a given date and coordinate, find the elevation of the source every
       10 mins. Return both the datetime object array and the elevation array"""
    # Find the start and the end times
@@ -43,20 +44,24 @@ def findTargetElevation(coord, obsDate):
    lofar.elevation = 15.
    
    # Create a target object
-   target = FixedBody()
-   target._epoch = '2000'
-   try:
-      coordTarget = SkyCoord(coord)
-   except:
-      return None, None
-   target._ra = coordTarget.ra.radian
-   target._dec= coordTarget.dec.radian
+   retData = []
+   srcNameList = srcName.split(',')
+   for i in range(len(coord)):
+      target = FixedBody()
+      target._epoch = '2000'
+      coordTarget = SkyCoord(coord[i])
+      target._ra = coordTarget.ra.radian
+      target._dec= coordTarget.dec.radian
    
-   # Iterate over each time interval and estimate the elevation of the target
-   yaxis = []
-   for item in xaxis:
-      lofar.date = item
-      target.compute(lofar)
-      yaxis.append( float(target.alt)*180./np.pi )
+      # Iterate over each time interval and estimate the elevation of the target
+      yaxis = []
+      for item in xaxis:
+         lofar.date = item
+         target.compute(lofar)
+         yaxis.append( float(target.alt)*180./np.pi )
+      
+      # Create a Plotly Scatter object that can be plotted later
+      retData.append( Scatter(x=xaxis, y=yaxis, mode='lines', 
+                               line={}, name=srcNameList[i] ) )
    
-   return xaxis, yaxis
+   return retData

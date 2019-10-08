@@ -96,7 +96,7 @@ def calculate_proc_size(obsT, intTime, nBaselines, nChan, nSB, pipeType, tAvg,
    else:
       pass
 
-def validate_inputs(obsT, nSB, integT, tAvg, fAvg, coord):
+def validate_inputs(obsT, nSB, integT, tAvg, fAvg, srcName, coord):
    """Valid text input supplied by the user: observation time, number of 
       subbands, and integration time. Following checks will be performed:
          - obsTime is a valid positive number
@@ -104,6 +104,7 @@ def validate_inputs(obsT, nSB, integT, tAvg, fAvg, coord):
          - integT is a valid positive number
          - tAvg is an integer
          - fAvg is an integer
+         - srcName is a string
          - coord is a valid AstroPy coordinate
       Return state=True/False accompanied by an error msg
       Note: all input parameters are still strings."""
@@ -141,6 +142,10 @@ def validate_inputs(obsT, nSB, integT, tAvg, fAvg, coord):
       msg += 'Invalid frequency averaging factor specified.'
    # Validate the coordinates specified under target setup
    if coord is not '':
+      # Warn if the number of targets do not match the number of coordinates
+      if len(srcName.split(',')) != len(coord):
+         msg += 'Number of target names do not match the number of coordinates. '
+      # Check if the coordinates are valid
       try:
          for i in range(len(coord)):
             SkyCoord(coord[i])

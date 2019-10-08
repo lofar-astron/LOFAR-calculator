@@ -385,13 +385,14 @@ def on_reset_click(n):
        State('fAvgRow','value'),
        State('dyCompressRow','value'),
        State('msgbox', 'is_open'),
+       State('targetNameRow', 'value'),
        State('coordRow', 'value'),
        State('dateRow', 'date')
     ]
 )
 def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB, 
                        integT, hbaMode, pipeType, tAvg, fAvg, dyCompress, 
-                       is_open, coord, obsDate):
+                       is_open, srcName, coord, obsDate):
     """Function defines what to do when the calculate button is clicked"""
     if is_open is True:
        # User has closed the error message box
@@ -403,7 +404,8 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
     else:
         # Calculate button has been clicked.
         # First, validate all command line inputs
-        status, msg = bk.validate_inputs(obsT, nSB, integT, tAvg, fAvg, coord)
+        status, msg = bk.validate_inputs(obsT, nSB, integT, tAvg, fAvg, 
+                                         srcName, coord)
         if status is False:
            print(msg)
            return '', '', '', '', msg, True, {'display':'none'}, {}
@@ -426,14 +428,11 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
               # User has specified a coordinate and it has passed validation
               # in the validate_inputs function.
               # Find target elevation across a 24-hour period
-              xaxis, yaxis = tv.findTargetElevation(coord, obsDate)
+              data = tv.findTargetElevation(srcName, coord, obsDate)
               # If xaxis is None, the user specified coordinates are wrong. 
               # Show error message
               displayFig = {'display':'block'}
-              plotFig = {'data':[{ 'type':'scatter',
-                                   'x': xaxis,
-                                   'y': yaxis
-                                }],
+              plotFig = {'data':data,
                          'layout':go.Layout(
                                     xaxis={'title':'Time (UTC)'},
                                     yaxis={'title':'Elevation'},
