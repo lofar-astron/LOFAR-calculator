@@ -255,7 +255,20 @@ calList = dbc.FormGroup([
                      ), width=dropWidth
              )
           ], row=True)
-targetGUISetup = dbc.Form([targetName, targetCoord, obsDate, calList])
+demixList = dbc.FormGroup([
+               dbc.Label('A-team sources', width=labelWidth-inpWidth),
+               dbc.Col(dcc.Dropdown(
+                        options=[
+                             {'label':'VirA', 'value':'VirA'},
+                             {'label':'CasA', 'value':'CasA'},
+                             {'label':'CygA', 'value':'CygA'},
+                             {'label':'TauA', 'value':'TauA'}
+                        ], searchable=True, clearable=True, 
+                           id='demixListRow', multi=True
+                     ), width=dropWidth
+             )
+          ], row=True)
+targetGUISetup = dbc.Form([targetName, targetCoord, obsDate, calList, demixList])
 pipeGUIFrame = html.Div(children=[
                 html.H3('Target setup'),
                 html.Hr(),

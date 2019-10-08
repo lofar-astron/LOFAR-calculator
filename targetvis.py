@@ -14,6 +14,14 @@ calib_coordinates = {
                        '3C147':'05h42m36.1379s +49d51m07.234s' 
                     }
 
+# Define coordinates of A-team sources
+ateam_coordinates = {
+                       'CygA' :'19h59m28.3566s +40d44m02.096s',
+                       'CasA':'23h23m24.000s +58d48m54.00s',
+                       'TauA':'05h34m31.94s +22d00m52.2s',
+                       'VirA':'12h30m49.4233s +12d23m28.043s' 
+                    }
+
 def resolve_source(names):
    """For a given source name, use astroquery to find its coordinates.
       The source name can be a single source or a comma separated list."""

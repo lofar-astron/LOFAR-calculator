@@ -388,12 +388,13 @@ def on_reset_click(n):
        State('targetNameRow', 'value'),
        State('coordRow', 'value'),
        State('dateRow', 'date'),
-       State('calListRow', 'value')
+       State('calListRow', 'value'),
+       State('demixListRow', 'value')
     ]
 )
 def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB, 
                        integT, hbaMode, pipeType, tAvg, fAvg, dyCompress, 
-                       is_open, srcName, coord, obsDate, calibNames):
+                       is_open, srcName, coord, obsDate, calibNames, ateamNames):
     """Function defines what to do when the calculate button is clicked"""
     if is_open is True:
        # User has closed the error message box
@@ -426,8 +427,16 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
            for i in range(len(calibNames)):
               srcName += ', {}'.format( calibNames[i] )
               coord.append( tv.calib_coordinates[calibNames[i]] )
+           
+           # Add A-team names to the target list so that they can be 
+           # plotted together
+           for i in range(len(ateamNames)):
+              srcName += ', {}'.format( ateamNames[i] )
+              coord.append( tv.ateam_coordinates[ateamNames[i]] )
+           
            print(srcName)
            print(coord)
+           
            if coord is '':
               # No source is specified under Target setup
               displayFig = {'display':'none'}
