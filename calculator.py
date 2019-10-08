@@ -3,19 +3,20 @@
 __author__ = "Sarrvesh S. Sridhar"
 __email__  = "sarrvesh@astron.nl"
 
+from random import randint
+import os
 import dash
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
+import plotly.graph_objs as go
 from gui import layout
 from gui import header, obsGUIFrame, pipeGUIFrame, resultGUIFrame
-from gui import defaultParams, msgBoxObsT, msgBoxnSB, msgBoxIntT, msgBox
+#from gui import defaultParams, msgBoxObsT, msgBoxnSB, msgBoxIntT, msgBox
+from gui import defaultParams, msgBoxnSB, msgBoxIntT, msgBox
 import backend as bk
 import targetvis as tv
 import generatepdf as g
-import os
-from random import randint
-import plotly.graph_objs as go
 
 # Initialize the dash app
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LUMEN])
@@ -424,18 +425,25 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
                                             int(tAvg), int(fAvg), dyCompress)
            # Add calibrator names to the target list so that they can be 
            # plotted together
-           for i in range(len(calibNames)):
-              srcName += ', {}'.format( calibNames[i] )
-              coord.append( tv.calib_coordinates[calibNames[i]] )
+           if calibNames is not None:
+              for i in range(len(calibNames)):
+                 if i == 0 and srcName is None:
+                    srcName = '{}'.format( calibNames[i] )
+                    coord = [ tv.calib_coordinates[calibNames[i]] ]
+                 else:
+                    srcName += ', {}'.format( calibNames[i] )
+                    coord.append( tv.calib_coordinates[calibNames[i]] )
            
            # Add A-team names to the target list so that they can be 
            # plotted together
-           for i in range(len(ateamNames)):
-              srcName += ', {}'.format( ateamNames[i] )
-              coord.append( tv.ateam_coordinates[ateamNames[i]] )
-           
-           print(srcName)
-           print(coord)
+           if ateamNames is not None:
+              for i in range(len(ateamNames)):
+                 if i == 0 and srcName is None:
+                    srcName = '{}'.format( ateamNames[i] )
+                    coord = [ tv.ateam_coordinates[ateamNames[i]] ]
+                 else:
+                    srcName += ', {}'.format( ateamNames[i] )
+                    coord.append( tv.ateam_coordinates[ateamNames[i]] )
            
            if coord is '':
               # No source is specified under Target setup
