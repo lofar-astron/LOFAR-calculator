@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 __author__ = "Sarrvesh S. Sridhar"
 __email__  = "sarrvesh@astron.nl"
 
