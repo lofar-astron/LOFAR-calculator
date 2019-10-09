@@ -1,10 +1,10 @@
+from datetime import datetime, timedelta
 from astroquery.simbad import Simbad
 from astropy.coordinates import SkyCoord
 from astropy import units as u
-from datetime import datetime, timedelta
-from ephem import Observer, FixedBody, degrees
+from ephem import Observer, FixedBody
 import numpy as np      
-from plotly.graph_objs import Scatter, Data
+from plotly.graph_objs import Scatter
 
 # Define coordinates of calibrators
 calib_coordinates = {
@@ -64,9 +64,9 @@ def findTargetElevation(srcName, coord, obsDate):
    for i in range(len(coord)):
       target = FixedBody()
       target._epoch = '2000'
-      coordTarget = SkyCoord(coord[i])
-      target._ra = coordTarget.ra.radian
-      target._dec= coordTarget.dec.radian
+      coord_target = SkyCoord(coord[i])
+      target._ra = coord_target.ra.radian
+      target._dec= coord_target.dec.radian
    
       # Iterate over each time interval and estimate the elevation of the target
       yaxis = []

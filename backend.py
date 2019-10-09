@@ -12,6 +12,8 @@ def compute_baselines(nCore, nRemote, nInt, hbaMode):
    return (nStations*(nStations+1))/2
 
 def calculate_im_noise(nCore, nRemote, nInt, hbaMode, obsT, nSB):
+   """Calculate the image sensitivity for a given number of stations, HBA/LBA mode,
+      observation time, and number of subbands."""
    # Hardcoded value for subband width 
    sbWidth = 195.3125 # kHz
    
@@ -20,7 +22,7 @@ def calculate_im_noise(nCore, nRemote, nInt, hbaMode, obsT, nSB):
    remotesefd = { 'lba' : 38160, 'hba' : 1410 }
    intsefd    = { 'lba' : 18840, 'hba' : 710  }
    
-   # Guess whether the user wants to observe with LBA or HBA.
+   # Figure out whether the user wants to observe with LBA or HBA.
    if 'hba' in hbaMode:
       mode = 'hba'
       nCore *= 2
