@@ -46,7 +46,6 @@ def findTargetElevation(srcName, coord, obsDate):
    endTime   = startTime + timedelta(days=1)
    # Get a list of values along the time axis
    xaxis = []
-   xaxis.append(startTime)
    tempTime = startTime
    while(tempTime < endTime):
       xaxis.append(tempTime)

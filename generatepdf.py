@@ -1,11 +1,47 @@
+from datetime import datetime, timedelta
 from fpdf import FPDF, HTMLMixin
+import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
 
 # Dummy class needed to generate the PDF file
 class MyFPDF(FPDF, HTMLMixin): pass
 
+def convertFigureToAxisInfo(figure):
+   """For a given Graph Figure object, return
+      xaxis (a list of datetime.datetime objects), 
+      yaxis (a list of source elevation), and 
+      label (name of the source as a string)."""
+   time_axis = figure['x']
+   xaxis = []
+   for val in time_axis:
+      d = datetime.strptime(val, '%Y-%m-%dT%H:%M:%S')
+      xaxis.append( d )
+   yaxis = figure['y']
+   label = figure['name']
+   return xaxis, yaxis, label
+
+def makePdfPlot(elevation_fig, outfilename):
+   """For a given elevation_fig object and output filename, generate a 
+      matplotlib plot and write it to disk."""
+   fig, ax = plt.subplots(1, 1, figsize=(8,5))
+   for figure in elevation_fig['data']:
+      xaxis, yaxis,label = convertFigureToAxisInfo(figure)
+      ax.plot(xaxis, yaxis, label=label)
+   hour_loc = (0, 3, 6, 9, 12, 15, 18, 21)
+   ax.xaxis.set_major_locator(mdates.HourLocator(hour_loc))
+   ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+   plt.xlabel('Time (UTC)')
+   plt.ylabel('Elevation (deg)')
+   plt.title('Target visibility plot')
+   
+   if len(elevation_fig['data']) > 1:
+      ax.legend()
+   plt.tight_layout()
+   plt.savefig(outfilename, dpi=100)
+
 def generatepdf(pdffile, obsT, nCore, nRemote, nInt, nChan, nSb, integT, 
                 antSet, pipeType, tAvg, fAvg, isDysco, imNoiseVal, rawSize, 
-                procSize, pipeTime, isMsgBoxOpen):
+                procSize, pipeTime, elevation_fig, isMsgBoxOpen):
    """Function to generate a pdf file summarizing the content of the calculator.
        Return nothing."""   
    # Create an A4 sheet
@@ -59,6 +95,16 @@ def generatepdf(pdffile, obsT, nCore, nRemote, nInt, nChan, nSb, integT,
       string += '    <td>{}</td></tr>'.format(pipeTime)
    string += '</tbody>'
    string += '</table>'
+   
+   # Generate a matplotlib plot showing the same plot as in the target 
+   # visibility plot
+   pdffilename = pdffile.replace('summary.pdf', 'plot.png')
+   makePdfPlot(elevation_fig, pdffilename)
+   
+   # Add the elevation plot 
+   string += '<center>'
+   string += '<img src={} width=400 height=250>'.format(pdffilename)
+   string += '</center>'
    
    # Write text to the pdf file
    pdf.write_html(string)

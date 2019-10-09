@@ -124,7 +124,7 @@ Nint = dbc.FormGroup([
 Nchan = dbc.FormGroup([
             dbc.Label('Number of channels per subband', width=labelWidth),
             dbc.Col(
-                dbc.Input(type='number', id='nChanRow', min=0, max=256), width=inpWidth
+                dbc.Input(type='number', id='nChanRow', min=1, max=256), width=inpWidth
             )
         ], row=True)
 Nsb = dbc.FormGroup([
@@ -317,11 +317,11 @@ pipeProcTime = dbc.FormGroup([
                ], row=True)
 warntext = \
 """
-**Note:**
+**Notes:**
 
 The sensitivity calculation performed by this tool follow [SKA Memo 113](http://www.skatelescope.org/uploaded/59513_113_Memo_Nijboer.pdf) by Nijboer, Pandey-Pommier & de Bruyn. It uses theoretical SEFD values. So, please use it with caution.
 
-LUCI was written and is maintained for the LOFAR Science Operations & Support group by Sarrvesh Sridhar.
+LUCI (version 20191008) was written and is maintained for the LOFAR Science Operations & Support group by Sarrvesh Sridhar. The source code is publicly available on [GitHub](https://github.com/scisup/LOFAR-calculator).
 """
 cautiontext = html.Div([
                   dcc.Markdown(children=warntext)

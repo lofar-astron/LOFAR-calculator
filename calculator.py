@@ -12,7 +12,6 @@ from dash.dependencies import Input, Output, State
 import plotly.graph_objs as go
 from gui import layout
 from gui import header, obsGUIFrame, pipeGUIFrame, resultGUIFrame
-#from gui import defaultParams, msgBoxObsT, msgBoxnSB, msgBoxIntT, msgBox
 from gui import defaultParams, msgBoxnSB, msgBoxIntT, msgBox
 import backend as bk
 import targetvis as tv
@@ -293,12 +292,15 @@ def on_resolve_click(n, closeMsgBox, targetName, is_open):
       State('pipeSizeRow', 'value'),
       State('pipeProcTimeRow', 'value'),
       
-      State('msgboxGenPdf', 'is_open')
+      State('msgboxGenPdf', 'is_open'),
+      
+      State('elevation-plot', 'figure')
    ]
 )
 def on_genpdf_click(n_clicks, closeMsgBox, obsT, nCore, nRemote, nInt, nChan,
                     nSb, integT, antSet, pipeType, tAvg, fAvg, isDysco, 
-                    imNoiseVal, rawSize, procSize, pipeTime, isMsgBoxOpen):
+                    imNoiseVal, rawSize, procSize, pipeTime, isMsgBoxOpen,
+                    elevation_fig):
    """Function defines what to do when the generate pdf button is clicked"""
    if isMsgBoxOpen is True and closeMsgBox is not None:
       # The message box is open and the user has clicked the close
@@ -323,7 +325,8 @@ def on_genpdf_click(n_clicks, closeMsgBox, obsT, nCore, nRemote, nInt, nChan,
          absPath = os.path.join(os.getcwd(), relPath)
          g.generatepdf(relPath, obsT, nCore, nRemote, nInt, nChan,
                     nSb, integT, antSet, pipeType, tAvg, fAvg, isDysco, 
-                    imNoiseVal, rawSize, procSize, pipeTime, isMsgBoxOpen)
+                    imNoiseVal, rawSize, procSize, pipeTime, elevation_fig,
+                    isMsgBoxOpen)
          return {'display':'block'}, relPath, False
 
 #######################################
