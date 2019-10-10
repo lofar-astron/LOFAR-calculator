@@ -160,7 +160,10 @@ buttons = html.Div([
             ])
           ])
 link = html.Div([
-          html.A(id='download-link', children='Download file')
+          html.A(id='download-link', 
+                 children='Download file', 
+                 style={'display':'none'}
+          )
        ])
 obsGUISetup = dbc.Form([obsTime, Ncore, Nremote, Nint, Nchan, 
                         Nsb, intTime, hbaDual, buttons, link])
@@ -174,7 +177,7 @@ obsGUIFrame = html.Div(children=[
 # Define the layout of the pipeline setup
 ###############################################################################
 pipeType = dbc.FormGroup([
-            dbc.Label('Pipeline', width=labelWidth),
+            dbc.Label('Pipeline', width=labelWidth-inpWidth),
             dbc.Col(
                 dcc.Dropdown(
                     options=[
@@ -187,7 +190,7 @@ pipeType = dbc.FormGroup([
             )
           ], row=True)
 tAvg = dbc.FormGroup([
-           dbc.Label('Time averaging factor', width=labelWidth, 
+           dbc.Label('Time averaging factor', width=labelWidth-inpWidth, 
                      id='tAvgRowL'
            ),
            dbc.Col(
@@ -196,7 +199,7 @@ tAvg = dbc.FormGroup([
            )
        ], row=True)
 fAvg = dbc.FormGroup([
-           dbc.Label('Frequency averaging factor', width=labelWidth,
+           dbc.Label('Frequency averaging factor', width=labelWidth-inpWidth,
                      id='fAvgRowL'
            ),
            dbc.Col(
@@ -205,7 +208,7 @@ fAvg = dbc.FormGroup([
            )
        ], row=True)
 dyCompress = dbc.FormGroup([
-                dbc.Label('Enable dysco compression?', width=labelWidth,
+                dbc.Label('Enable dysco compression?', width=labelWidth-inpWidth,
                           id='dyCompressRowL'
                 ),
                 dbc.Col(
@@ -219,6 +222,10 @@ dyCompress = dbc.FormGroup([
                 )
              ], row=True)
 pipeGUISetup = dbc.Form([pipeType, tAvg, fAvg, dyCompress])
+
+###############################################################################
+# Define the layout of the target setup
+###############################################################################
 targetName = dbc.FormGroup([
                 dbc.Label('Target', width=labelWidth-inpWidth, 
                           id='targetNameRowL'
@@ -321,11 +328,11 @@ warntext = \
 
 The sensitivity calculation performed by this tool follow [SKA Memo 113](http://www.skatelescope.org/uploaded/59513_113_Memo_Nijboer.pdf) by Nijboer, Pandey-Pommier & de Bruyn. It uses theoretical SEFD values. So, please use it with caution.
 
-LUCI (version 20191008) was written and is maintained for the LOFAR Science Operations & Support group by Sarrvesh Sridhar. The source code is publicly available on [GitHub](https://github.com/scisup/LOFAR-calculator).
+LUCI (version 20191008) was written and is maintained for the LOFAR Science Operations & Support group by Sarrvesh Sridhar. The source code is publicly available on [GitHub](https://github.com/scisup/LOFAR-calculator). For comments and/or feature requests, please contact the Science Operations & Support group using the [Helpdesk](https://support.astron.nl/rohelpdesk).
 """
 cautiontext = html.Div([
                   dcc.Markdown(children=warntext)
-              ], style={'width':'85%'})
+              ], style={'width':'90%'})
 resultGUISetup = dbc.Form([imNoise, rawSize, pipeSize, pipeProcTime, cautiontext])
 resultGUIFrame = html.Div(children=[
                     html.H3('Results'),
@@ -336,26 +343,35 @@ resultGUIFrame = html.Div(children=[
 ###############################################################################
 # Layout of the graph
 ###############################################################################
-graph = dbc.Row(dbc.Col(
-           html.Div([ 
-               dcc.Graph(id='elevation-plot', 
-                         figure={'layout':{'title':'Target visibility plot'}}
-               )
-           ])
-        ), id='graphRow', style={'width':'66%'})
+graph = dbc.Row([
+           dbc.Col(
+              html.Div([ 
+                 dcc.Graph(id='elevation-plot', 
+                           figure={'layout':{'title':'Target visibility plot'}},
+                           style={'height':600}
+                 )
+              ]), width=7
+           ),
+           dbc.Col(
+              html.Div([
+                 dcc.Graph(id='beam-plot', 
+                           figure={'layout':{'title':'Sample title'}},
+                           style={'height':600}
+                 )
+              ]), width=5
+           )
+        ])
 
 ###############################################################################
 # Define the layout of the calculator
 ###############################################################################
-layout = html.Div([
-                     dbc.Row(dbc.Col(header)),
-                     dbc.Row([
-                                dbc.Col(obsGUIFrame),
-                                dbc.Col(pipeGUIFrame),
-                                dbc.Col(resultGUIFrame)
-                     ]),
-                     graph,
+layout = html.Div([dbc.Row(dbc.Col(header)),
+                   dbc.Row([dbc.Col(obsGUIFrame),
+                            dbc.Col(pipeGUIFrame),
+                            dbc.Col(resultGUIFrame)
+                   ]),
+                   graph,
                      
-                     msgBoxObsT, msgBoxnSB, msgBoxIntT, msgBoxTAvg, msgBoxFAvg,
-                     msgBoxResolve, msgBoxGenPdf, msgBox
-                  ])
+                   msgBoxObsT, msgBoxnSB, msgBoxIntT, msgBoxTAvg, msgBoxFAvg,
+                   msgBoxResolve, msgBoxGenPdf, msgBox
+         ])

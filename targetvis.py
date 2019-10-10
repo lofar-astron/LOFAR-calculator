@@ -4,7 +4,7 @@ from astropy.coordinates import SkyCoord
 from astropy import units as u
 from ephem import Observer, FixedBody
 import numpy as np      
-from plotly.graph_objs import Scatter
+from plotly.graph_objs import Scatter, Layout
 
 # Define coordinates of calibrators
 calib_coordinates = {
@@ -22,6 +22,119 @@ ateam_coordinates = {
                        'VirA':'12h30m49.4233s +12d23m28.043s' 
                     }
 
+# FWHM of HBA tile beam in deg
+tile_beam_size = 20
+
+# TODO: FWHM of LBA dipole beam in deg
+
+def getStationBeamSize(nCore, nRemote, nInt, antenna_mode):
+   """Return FWHM of station beam for a given antenna list and array mode"""
+   # FWHM of station beams in deg
+   corefwhm =   {'lba':5.16, 'hba':3.80}
+   remotefwhm = {'lba':5.16, 'hba':2.85}
+   intfwhm =    {'lba':6.46, 'hba':2.07}
+   if 'lba' in antenna_mode:
+      mode = 'lba'
+      station_beam = corefwhm[mode]
+   else:
+      mode = 'hba'
+      if nInt > 0:
+         station_beam = intfwhm[mode]
+      elif nRemote > 0 and 'inner' not in antenna_mode:
+         # Antenna set is untapered remote station
+         station_beam = remotefwhm[mode]
+      else:
+         # Antenna set is either just the core or core + tapered remote
+         station_beam = corefwhm[mode]
+   return station_beam
+
+def getTileBeam(coord):
+   """Returns the midpoint between the different pointings in coord.
+      If coord has one item, midpoint is the same as that item.
+      Note that the midpoint on the sky for large angular separation 
+      is ill-defined. In our case, it is almost always within ~7 degrees
+      and so this should be fine. For more details, see 
+      https://github.com/astropy/astropy/issues/5766"""
+   tempRA = 0.
+   tempDec= 0.
+   nBeams = len(coord)
+   for c in coord:
+      this_coord = SkyCoord(c)
+      tempRA += this_coord.ra.degree
+      tempDec+= this_coord.dec.degree
+   t_beam = SkyCoord(tempRA/nBeams, tempDec/nBeams, unit=u.deg)
+   return t_beam
+
+def getAxesRange(layout):
+   """For a given layout dict, find the axes limits"""
+   xmin = 0.
+   ymin = 0.
+   xmax = 0.
+   ymax = 0.
+   temp_xmin = []; temp_ymin = []
+   temp_xmax = []; temp_ymax = []
+   for item in layout['shapes']:
+      temp_xmin.append(item['x0'])
+      temp_xmax.append(item['x1'])
+      temp_ymin.append(item['y0'])
+      temp_ymax.append(item['y1'])
+   xmin = int(np.min(temp_xmin))
+   xmax = int(np.max(temp_xmax))
+   ymin = int(np.min(temp_ymin))
+   ymax = int(np.max(temp_ymax))
+   return xmin, xmax, ymin, ymax
+
+def findBeamLayout(srcName, coord, nCore, nRemote, nInt, antenna_mode):
+   """For a given set of source coordinates, station list, and array mode,
+      generate a plotly Data object for the dipole/tile/station beams"""
+   station_beam_size = getStationBeamSize(nCore, nRemote, nInt, antenna_mode)/2
+   # Create an initial layout object
+   layout = {'shapes': [], 
+             'xaxis':{'title':'Right Ascension (degree)'}, 
+             'yaxis':{'title':'Declination (degree)'},
+             'title':'Beam layout'
+            }
+   
+   # Iterate over coord and plot the station beam
+   for c in coord:
+      s_beam = SkyCoord(c)
+      layout['shapes'].append(
+         {
+         'type':'circle',
+         'xref':'x',
+         'yref':'y',
+         'x0': s_beam.ra.deg-station_beam_size,
+         'x1': s_beam.ra.deg+station_beam_size,
+         'y0': s_beam.dec.deg-station_beam_size,
+         'y1': s_beam.dec.deg+station_beam_size,
+         'line': {'color':'rgba(50, 171, 96, 1)'}            
+         }
+      )
+      
+   # If antenna_mode is hba, point the station beam
+   if 'hba' in antenna_mode:   
+      # Calculate the reference tile beam 
+      t_beam = getTileBeam(coord)
+      layout['shapes'].append(
+         {
+         'type':'circle',
+         'xref':'x',
+         'yref':'y',
+         'x0': t_beam.ra.deg-tile_beam_size/2,
+         'x1': t_beam.ra.deg+tile_beam_size/2,
+         'y0': t_beam.dec.deg-tile_beam_size/2,
+         'y1': t_beam.dec.deg+tile_beam_size/2,
+         'line': {'color':'rgba(250, 0, 250, 1)'}            
+         }
+      )
+   
+   # Set the axes range to display
+   bufsize = 2 # Buffer space in degrees
+   xmin, xmax, ymin, ymax = getAxesRange(layout)
+   layout['xaxis']['range'] = [xmin-bufsize,xmax+bufsize]
+   layout['yaxis']['range'] = [ymin-bufsize,ymax+bufsize]
+   return {'layout': layout}
+
 def resolve_source(names):
    """For a given source name, use astroquery to find its coordinates.
       The source name can be a single source or a comma separated list."""
@@ -34,7 +147,7 @@ def resolve_source(names):
          coord = SkyCoord('{} {}'.format(ra, dec), unit=(u.hourangle, u.deg))
          retString.append( coord.to_string('hmsdms') )
    except:
-      return None
+      retString = None
    return retString
 
 def findTargetElevation(srcName, coord, obsDate):

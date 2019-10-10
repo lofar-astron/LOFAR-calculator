@@ -313,7 +313,7 @@ def on_genpdf_click(n_clicks, closeMsgBox, obsT, nCore, nRemote, nInt, nChan,
          return {'display':'none'}, '', True
       else:
          # Generate a random number so that this user's pdf can be stored here 
-         randnum = '{:04d}'.format(randint(0,1000))
+         randnum = '{:05d}'.format(randint(0,10000))
          relPath = os.path.join('static', randnum)
          # Create this folder
          absPath = os.path.join(os.getcwd(), relPath)
@@ -368,8 +368,10 @@ def on_reset_click(n):
        Output('pipeProcTimeRow','value'),
        Output('msgBoxBody', 'children'),
        Output('msgbox', 'is_open'),
-       Output('graphRow', 'style'),
-       Output('elevation-plot', 'figure')
+       Output('elevation-plot', 'style'),
+       Output('elevation-plot', 'figure'),
+       Output('beam-plot', 'style'),
+       Output('beam-plot', 'figure')
     ],
     [  Input('calculate','n_clicks'), 
        Input('msgBoxClose', 'n_clicks'),
@@ -400,20 +402,28 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
     """Function defines what to do when the calculate button is clicked"""
     if is_open is True:
        # User has closed the error message box
-       return '', '', '', '', '', False, {'display':'none'}, {}
+       return '', '', '', '', '', False, \
+              {'display':'none'}, {}, {'display':'none'}, {}
     if n is None:
         # Calculate button has not been clicked yet
         # So, do nothing and set default values to results field
-        return '', '', '', '', '', False, {'display':'none'}, {}
+        return '', '', '', '', '', False, \
+               {'display':'none'}, {}, {'display':'none'}, {}
     else:
         # Calculate button has been clicked.
         # First, validate all command line inputs
         status, msg = bk.validate_inputs(obsT, nSB, integT, tAvg, fAvg, 
                                          srcName, coord)
         if status is False:
-           print(msg)
-           return '', '', '', '', msg, True, {'display':'none'}, {}
+           return '', '', '', '', msg, True, \
+                  {'display':'none'}, {}, {'display':'none'}, {}
         else:
+           # If the user sets nCore, nRemote, or nInt to 0, dash return None.
+           # TODO: Why is this?
+           # Correct this manually, for now.
+           if nCore is None: nCore = 0
+           if nRemote is None: nRemote = 0
+           if nInt is None: nInt = 0
            # Estimate the raw data size
            nBaselines = bk.compute_baselines(int(nCore), int(nRemote), 
                                              int(nInt), hbaMode)
@@ -449,22 +459,33 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
            if coord is '':
               # No source is specified under Target setup
               displayFig = {'display':'none'}
-              plotFig = {}
+              elevationFig = {}
+              beamFig = {}
            else:
               # User has specified a coordinate and it has passed validation
               # in the validate_inputs function.
               # Find target elevation across a 24-hour period
               data = tv.findTargetElevation(srcName, coord, obsDate)
-              displayFig = {'display':'block'}
-              plotFig = {'data':data,
-                         'layout':go.Layout(
-                                    xaxis={'title':'Time (UTC)'},
-                                    yaxis={'title':'Elevation'},
-                                    title='Target visibility plot'
-                                  )
-                        }
+              displayFig = {'display':'block', 'height':600}
+              elevationFig = {'data':data,
+                              'layout':go.Layout(
+                                       xaxis={'title':'Time (UTC)'},
+                                       yaxis={'title':'Elevation'},
+                                       title='Target visibility plot'
+                                       )
+                             }
+              # Find the position of the station and tile beam 
+              beamFig = tv.findBeamLayout(srcName, coord, int(nCore), \
+                                       int(nRemote), int(nInt), hbaMode)
+              #beamFig = {'layout':go.Layout(
+              #             xaxis={'title':'Declination (degrees)', 
+              #                    'autorange':'reversed'},
+              #             yaxis={'title':'Right Ascension (degrees)'},
+              #             title='Beam layout',
+              #             )
+              #          }
            return imNoise, rawSize, avgSize, 0, '', \
-                  False, displayFig, plotFig
+                  False, displayFig, elevationFig, displayFig, beamFig
 
 if __name__ == '__main__':
     app.run_server(debug=True)
