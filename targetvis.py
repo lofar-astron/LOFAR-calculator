@@ -131,7 +131,8 @@ def findBeamLayout(srcName, coord, nCore, nRemote, nInt, antenna_mode):
    # Set the axes range to display
    bufsize = 2 # Buffer space in degrees
    xmin, xmax, ymin, ymax = getAxesRange(layout)
-   layout['xaxis']['range'] = [xmin-bufsize,xmax+bufsize]
+   # Swap xmin and xmax so that declination decreases to the right.
+   layout['xaxis']['range'] = [xmax+bufsize,xmin-bufsize]
    layout['yaxis']['range'] = [ymin-bufsize,ymax+bufsize]
    return {'layout': layout}
 
