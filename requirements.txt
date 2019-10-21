@@ -1,0 +1,8 @@
+astroquery
+astropy
+dash
+dash-bootstrap-components
+ephem
+fpdf
+matplotlib
+numpy
