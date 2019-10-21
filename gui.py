@@ -253,7 +253,7 @@ calList = dbc.FormGroup([
              dbc.Label('Calibrators', width=labelWidth-inpWidth),
              dbc.Col(dcc.Dropdown(
                         options=[
-                             {'label':'3C48', 'value':'3C38'},
+                             {'label':'3C48', 'value':'3C48'},
                              {'label':'3C147', 'value':'3C147'},
                              {'label':'3C196', 'value':'3C196'},
                              {'label':'3C295', 'value':'3C295'}
