@@ -10,7 +10,7 @@ from dash.dependencies import Input, Output, State
 import plotly.graph_objs as go
 from gui import layout
 from gui import header, obsGUIFrame, pipeGUIFrame, resultGUIFrame
-from gui import defaultParams, msgBoxnSB, msgBoxIntT, msgBox
+from gui import defaultParams, msgBoxnSB, msgBox
 import backend as bk
 import targetvis as tv
 import generatepdf as g
@@ -78,40 +78,6 @@ def toggle_pipeline(value):
 )
 def validate_nSB(n_blur, n_clicks, value, is_open):
    """Validate the number of subbands and display error message if needed"""   
-   if is_open is True and n_clicks is not None:
-      # The message box is open and the user has clicked the close
-      # button. Close the alert message
-      return False  
-   if n_blur is None:
-      # The page is loading. Do not validate anything
-      return False
-   else:
-      # Observation time text box has lost focus. 
-      # Go ahead and validate the text in it.
-      try:
-         int(value)
-      except ValueError:
-         return True
-      if not int(value) > 0:
-         return True
-      return False
-
-#######################################
-# Validate integration time
-#######################################
-@app.callback(
-   Output('msgboxIntT', 'is_open'),
-   [ 
-      Input('intTimeRow', 'n_blur'), 
-      Input('mbintTClose', 'n_clicks') 
-   ],
-   [ 
-      State('intTimeRow', 'value'),
-      State('msgboxIntT', 'is_open')
-   ]
-)
-def validate_integT(n_blur, n_clicks, value, is_open):
-   """Validate the integration time and display error message if needed"""   
    if is_open is True and n_clicks is not None:
       # The message box is open and the user has clicked the close
       # button. Close the alert message

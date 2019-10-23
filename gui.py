@@ -14,13 +14,6 @@ msgBoxnSB = dbc.Modal([
                                         dbc.Button('Close', id='mbnSBClose')
                                         )
                       ], id='msgboxnSB', centered=True)
-msgBoxIntT = dbc.Modal([
-                         dbc.ModalHeader(modalHeader),
-                         dbc.ModalBody('Invalid integration time specified'),
-                         dbc.ModalFooter(
-                                        dbc.Button('Close', id='mbintTClose')
-                                        )
-                       ], id='msgboxIntT', centered=True)
 msgBoxTAvg = dbc.Modal([
                          dbc.ModalHeader(modalHeader),
                          dbc.ModalBody('Invalid time averaging factor specified'),
@@ -365,6 +358,6 @@ layout = html.Div([dbc.Row(dbc.Col(header)),
                    ]),
                    graph,
                      
-                   msgBoxnSB, msgBoxIntT, msgBoxTAvg, msgBoxFAvg,
+                   msgBoxnSB, msgBoxTAvg, msgBoxFAvg,
                    msgBoxResolve, msgBoxGenPdf, msgBox
          ])
