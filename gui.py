@@ -55,14 +55,22 @@ msgBox = dbc.Modal([
 ###############################################################################
 # Default values for various input fields
 ###############################################################################
-defaultParams = {'obsTime':'28800', 'Ncore':'24', 'Nremote':'14',
-                 'Nint':'13', 'Nchan':'64', 'Nsb':'488',
-                 'intTime':'1', 'hbaDual':'hbadualinner',
+defaultParams = {'obsTime':'28800', 
+                 'Ncore':'24', 
+                 'Nremote':'14',
+                 'Nint':'14', 
+                 'Nchan':'64', 
+                 'Nsb':'488',
+                 'intTime':'1', 
+                 'hbaDual':'hbadualinner',
                  
-                 'pipeType':'none', 'tAvg':'1', 'fAvg':'1', 
+                 'pipeType':'none', 
+                 'tAvg':'1', 
+                 'fAvg':'1', 
                  'dyCompress':'enable',
                  
-                 'targetName':'', 'target_coord':'',
+                 'targetName':'', 
+                 'target_coord':'',
                 }
 
 ###############################################################################
@@ -103,7 +111,7 @@ Nremote = dbc.FormGroup([
 Nint = dbc.FormGroup([
             dbc.Label('Number of international stations', width=labelWidth),
             dbc.Col(
-                dbc.Input(type='number', id='nIntRow', min=0, max=13), 
+                dbc.Input(type='number', id='nIntRow', min=0, max=14), 
                 width=inpWidth
             )
         ], row=True)
