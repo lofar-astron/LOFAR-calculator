@@ -124,7 +124,6 @@ def validate_inputs(obsT, nCore, nRemote, nInt, nSB, integT, tAvg,
    except ValueError:
       msg += 'Invalid observation time specified.\n'
    # Validate the number of stations
-   print(nCore, nRemote, nInt)
    if nCore < 0 or nCore > 24:
       msg += 'Number of core stations must be between 0 and 24.\n'
    if nRemote < 0 or nRemote > 14:
