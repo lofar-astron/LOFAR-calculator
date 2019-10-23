@@ -342,8 +342,15 @@ graph = dbc.Row([
            dbc.Col(
               html.Div([
                  dcc.Graph(id='beam-plot', 
-                           figure={'layout':{'title':'Sample title'}},
-                           style={'height':600}
+                           figure={'layout':{'title':'Beam Layout'}},
+                           style={'height':600},
+                           config={
+                              'modeBarButtonsToRemove':\
+                                  ['toggleSpikelines', \
+                                   'hoverCompareCartesian', \
+                                   'hoverClosestCartesian' \
+                                  ]
+                           }
                  )
               ]), width=5
            )

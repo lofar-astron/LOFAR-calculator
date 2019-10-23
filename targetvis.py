@@ -134,7 +134,10 @@ def findBeamLayout(srcName, coord, nCore, nRemote, nInt, antenna_mode):
    # Swap xmin and xmax so that declination decreases to the right.
    layout['xaxis']['range'] = [xmax+bufsize,xmin-bufsize]
    layout['yaxis']['range'] = [ymin-bufsize,ymax+bufsize]
-   return {'layout': layout}
+   # We need to define plotly data is we want to reset/autoscale the axes.
+   # So, plot a single scatter point
+   data = Scatter(x=np.asarray(xmax), y=np.asarray(ymax), mode='lines')
+   return {'layout': layout, 'data':[data]}
 
 def resolve_source(names):
    """For a given source name, use astroquery to find its coordinates.
