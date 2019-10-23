@@ -377,13 +377,7 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
               # Find the position of the station and tile beam 
               beamFig = tv.findBeamLayout(srcName, coord, int(nCore), \
                                        int(nRemote), int(nInt), hbaMode)
-              #beamFig = {'layout':go.Layout(
-              #             xaxis={'title':'Declination (degrees)', 
-              #                    'autorange':'reversed'},
-              #             yaxis={'title':'Right Ascension (degrees)'},
-              #             title='Beam layout',
-              #             )
-              #          }
+
            return imNoise, rawSize, avgSize, 0, '', \
                   False, displayFig, elevationFig, displayFig, beamFig
 
