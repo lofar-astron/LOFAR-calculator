@@ -63,40 +63,6 @@ def toggle_pipeline(value):
                {'display':'block'}, {'display':'block'}
 
 #######################################
-# Validate observation time
-#######################################
-@app.callback(
-   Output('msgboxObsT', 'is_open'),
-   [ 
-      Input('obsTimeRow', 'n_blur'), 
-      Input('mbObsTClose', 'n_clicks') 
-   ],
-   [ 
-      State('obsTimeRow', 'value'),
-      State('msgboxObsT', 'is_open')
-   ]
-)
-def validate_obsT(n_blur, n_clicks, value, is_open):
-   """Validate observation time and display error message if needed"""   
-   if is_open is True and n_clicks is not None:
-      # The message box is open and the user has clicked the close
-      # button. Close the alert message
-      return False
-   if n_blur is None:
-      # The page is loading. Do not validate anything
-      return False
-   else:
-      # Observation time text box has lost focus. 
-      # Go ahead and validate the text in it.
-      try:
-         float(value)
-      except ValueError:
-         return True
-      if not float(value) > 0:
-         return True
-      return False
-
-#######################################
 # Validate number of subbands
 #######################################
 @app.callback(

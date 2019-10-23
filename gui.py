@@ -7,13 +7,6 @@ from datetime import date
 # Define a modal to display error messages for observation time
 ###############################################################################
 modalHeader = html.H2('Error')
-msgBoxObsT = dbc.Modal([
-                       dbc.ModalHeader(modalHeader),                       
-                       dbc.ModalBody('Invalid observation time specified'),
-                       dbc.ModalFooter(
-                                      dbc.Button('Close', id='mbObsTClose')
-                                      )
-                       ], id='msgboxObsT', centered=True)
 msgBoxnSB = dbc.Modal([
                          dbc.ModalHeader(modalHeader),
                          dbc.ModalBody('Invalid number of subbands specified'),
@@ -372,6 +365,6 @@ layout = html.Div([dbc.Row(dbc.Col(header)),
                    ]),
                    graph,
                      
-                   msgBoxObsT, msgBoxnSB, msgBoxIntT, msgBoxTAvg, msgBoxFAvg,
+                   msgBoxnSB, msgBoxIntT, msgBoxTAvg, msgBoxFAvg,
                    msgBoxResolve, msgBoxGenPdf, msgBox
          ])
