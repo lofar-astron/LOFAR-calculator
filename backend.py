@@ -123,6 +123,8 @@ def validate_inputs(obsT, nSB, integT, tAvg, fAvg, srcName, coord):
       int(nSB)
       if int(nSB) < 1:
          msg += 'Number of subbands cannot be less than 1.\n'
+      if int(nSB) > 488:
+         msg += 'Number of subbands cannot be larger than 488.\n'
    except ValueError:
       msg += 'Invalid number of subbands specified.\n'
    # Validate integration time
