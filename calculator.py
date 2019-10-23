@@ -310,18 +310,20 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
     else:
         # Calculate button has been clicked.
         # First, validate all command line inputs
-        status, msg = bk.validate_inputs(obsT, nSB, integT, tAvg, fAvg, 
+
+        # If the user sets nCore, nRemote, or nInt to 0, dash return None.
+        # TODO: Why is this?
+        # Correct this manually, for now.
+        if nCore is None: nCore = '0'
+        if nRemote is None: nRemote = '0'
+        if nInt is None: nInt = '0'
+        status, msg = bk.validate_inputs(obsT, int(nCore), int(nRemote), \
+                                         int(nInt), nSB, integT, tAvg, fAvg, \
                                          srcName, coord)
         if status is False:
            return '', '', '', '', msg, True, \
                   {'display':'none'}, {}, {'display':'none'}, {}
         else:
-           # If the user sets nCore, nRemote, or nInt to 0, dash return None.
-           # TODO: Why is this?
-           # Correct this manually, for now.
-           if nCore is None: nCore = 0
-           if nRemote is None: nRemote = 0
-           if nInt is None: nInt = 0
            # Estimate the raw data size
            nBaselines = bk.compute_baselines(int(nCore), int(nRemote), 
                                              int(nInt), hbaMode)

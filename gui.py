@@ -88,23 +88,23 @@ obsTime = dbc.FormGroup([
             )
           ], row=True)
 Ncore = dbc.FormGroup([
-            dbc.Label('Number of core stations', width=labelWidth),
+            dbc.Label('No. of core stations (0 - 24)', width=labelWidth),
             dbc.Col(
-                dbc.Input(type='number', id='nCoreRow', min=0, max=24),
+                dbc.Input(type='number', id='nCoreRow'),
                 width=inpWidth
             )
         ], row=True)
 Nremote = dbc.FormGroup([
-            dbc.Label('Number of remote stations', width=labelWidth),
+            dbc.Label('No. of remote stations (0 - 14)', width=labelWidth),
             dbc.Col(
-                dbc.Input(type='number', id='nRemoteRow', min=0, max=14), 
+                dbc.Input(type='number', id='nRemoteRow'), 
                 width=inpWidth
             )            
         ], row=True)
 Nint = dbc.FormGroup([
-            dbc.Label('Number of international stations', width=labelWidth),
+            dbc.Label('No. of international stations (0 - 14)', width=labelWidth),
             dbc.Col(
-                dbc.Input(type='number', id='nIntRow', min=0, max=14), 
+                dbc.Input(type='number', id='nIntRow'), 
                 width=inpWidth
             )
         ], row=True)
