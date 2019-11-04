@@ -10,7 +10,7 @@ from dash.dependencies import Input, Output, State
 import plotly.graph_objs as go
 from gui import layout
 from gui import header, obsGUIFrame, pipeGUIFrame, resultGUIFrame
-from gui import defaultParams, msgBoxnSB, msgBoxIntT, msgBox
+from gui import defaultParams, msgBox
 import backend as bk
 import targetvis as tv
 import generatepdf as g
@@ -61,108 +61,6 @@ def toggle_pipeline(value):
                {'display':'block'}, {'display':'block'}, \
                {'display':'block'}, {'display':'block'}, \
                {'display':'block'}, {'display':'block'}
-
-#######################################
-# Validate observation time
-#######################################
-@app.callback(
-   Output('msgboxObsT', 'is_open'),
-   [ 
-      Input('obsTimeRow', 'n_blur'), 
-      Input('mbObsTClose', 'n_clicks') 
-   ],
-   [ 
-      State('obsTimeRow', 'value'),
-      State('msgboxObsT', 'is_open')
-   ]
-)
-def validate_obsT(n_blur, n_clicks, value, is_open):
-   """Validate observation time and display error message if needed"""   
-   if is_open is True and n_clicks is not None:
-      # The message box is open and the user has clicked the close
-      # button. Close the alert message
-      return False
-   if n_blur is None:
-      # The page is loading. Do not validate anything
-      return False
-   else:
-      # Observation time text box has lost focus. 
-      # Go ahead and validate the text in it.
-      try:
-         float(value)
-      except ValueError:
-         return True
-      if not float(value) > 0:
-         return True
-      return False
-
-#######################################
-# Validate number of subbands
-#######################################
-@app.callback(
-   Output('msgboxnSB', 'is_open'),
-   [ 
-      Input('nSbRow', 'n_blur'), 
-      Input('mbnSBClose', 'n_clicks') 
-   ],
-   [ 
-      State('nSbRow', 'value'),
-      State('msgboxnSB', 'is_open')
-   ]
-)
-def validate_nSB(n_blur, n_clicks, value, is_open):
-   """Validate the number of subbands and display error message if needed"""   
-   if is_open is True and n_clicks is not None:
-      # The message box is open and the user has clicked the close
-      # button. Close the alert message
-      return False  
-   if n_blur is None:
-      # The page is loading. Do not validate anything
-      return False
-   else:
-      # Observation time text box has lost focus. 
-      # Go ahead and validate the text in it.
-      try:
-         int(value)
-      except ValueError:
-         return True
-      if not int(value) > 0:
-         return True
-      return False
-
-#######################################
-# Validate integration time
-#######################################
-@app.callback(
-   Output('msgboxIntT', 'is_open'),
-   [ 
-      Input('intTimeRow', 'n_blur'), 
-      Input('mbintTClose', 'n_clicks') 
-   ],
-   [ 
-      State('intTimeRow', 'value'),
-      State('msgboxIntT', 'is_open')
-   ]
-)
-def validate_integT(n_blur, n_clicks, value, is_open):
-   """Validate the integration time and display error message if needed"""   
-   if is_open is True and n_clicks is not None:
-      # The message box is open and the user has clicked the close
-      # button. Close the alert message
-      return False  
-   if n_blur is None:
-      # The page is loading. Do not validate anything
-      return False
-   else:
-      # Observation time text box has lost focus. 
-      # Go ahead and validate the text in it.
-      try:
-         int(value)
-      except ValueError:
-         return True
-      if not int(value) > 0:
-         return True
-      return False
 
 #######################################
 # Validate time averaging factor
@@ -412,18 +310,20 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
     else:
         # Calculate button has been clicked.
         # First, validate all command line inputs
-        status, msg = bk.validate_inputs(obsT, nSB, integT, tAvg, fAvg, 
+
+        # If the user sets nCore, nRemote, or nInt to 0, dash return None.
+        # TODO: Why is this?
+        # Correct this manually, for now.
+        if nCore is None: nCore = '0'
+        if nRemote is None: nRemote = '0'
+        if nInt is None: nInt = '0'
+        status, msg = bk.validate_inputs(obsT, int(nCore), int(nRemote), \
+                                         int(nInt), nSB, integT, tAvg, fAvg, \
                                          srcName, coord)
         if status is False:
            return '', '', '', '', msg, True, \
                   {'display':'none'}, {}, {'display':'none'}, {}
         else:
-           # If the user sets nCore, nRemote, or nInt to 0, dash return None.
-           # TODO: Why is this?
-           # Correct this manually, for now.
-           if nCore is None: nCore = 0
-           if nRemote is None: nRemote = 0
-           if nInt is None: nInt = 0
            # Estimate the raw data size
            nBaselines = bk.compute_baselines(int(nCore), int(nRemote), 
                                              int(nInt), hbaMode)
@@ -477,13 +377,7 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
               # Find the position of the station and tile beam 
               beamFig = tv.findBeamLayout(srcName, coord, int(nCore), \
                                        int(nRemote), int(nInt), hbaMode)
-              #beamFig = {'layout':go.Layout(
-              #             xaxis={'title':'Declination (degrees)', 
-              #                    'autorange':'reversed'},
-              #             yaxis={'title':'Right Ascension (degrees)'},
-              #             title='Beam layout',
-              #             )
-              #          }
+
            return imNoise, rawSize, avgSize, 0, '', \
                   False, displayFig, elevationFig, displayFig, beamFig
 

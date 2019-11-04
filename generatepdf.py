@@ -64,12 +64,8 @@ def generatepdf(pdffile, obsT, nCore, nRemote, nInt, nChan, nSb, integT,
    string += '    <td>{}</td></tr>'.format(nChan)
    string += '<tr><td>Integration time (in seconds)</td>'
    string += '    <td>{}</td></tr>'.format(integT)
-   if antSet == 'enable':
-      mode = 'HBA'
-   else:
-      mode = 'LBA'
    string += '<tr><td>Antenna set</td>'
-   string += '    <td>{}</td></tr>'.format(mode)
+   string += '    <td>{}</td></tr>'.format(antSet)
    string += '<tr></tr>'
    string += '<tr><td>Pipeline type</td>'
    if pipeType == 'none':

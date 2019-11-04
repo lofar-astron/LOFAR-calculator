@@ -7,27 +7,6 @@ from datetime import date
 # Define a modal to display error messages for observation time
 ###############################################################################
 modalHeader = html.H2('Error')
-msgBoxObsT = dbc.Modal([
-                       dbc.ModalHeader(modalHeader),                       
-                       dbc.ModalBody('Invalid observation time specified'),
-                       dbc.ModalFooter(
-                                      dbc.Button('Close', id='mbObsTClose')
-                                      )
-                       ], id='msgboxObsT', centered=True)
-msgBoxnSB = dbc.Modal([
-                         dbc.ModalHeader(modalHeader),
-                         dbc.ModalBody('Invalid number of subbands specified'),
-                         dbc.ModalFooter(
-                                        dbc.Button('Close', id='mbnSBClose')
-                                        )
-                      ], id='msgboxnSB', centered=True)
-msgBoxIntT = dbc.Modal([
-                         dbc.ModalHeader(modalHeader),
-                         dbc.ModalBody('Invalid integration time specified'),
-                         dbc.ModalFooter(
-                                        dbc.Button('Close', id='mbintTClose')
-                                        )
-                       ], id='msgboxIntT', centered=True)
 msgBoxTAvg = dbc.Modal([
                          dbc.ModalHeader(modalHeader),
                          dbc.ModalBody('Invalid time averaging factor specified'),
@@ -69,14 +48,22 @@ msgBox = dbc.Modal([
 ###############################################################################
 # Default values for various input fields
 ###############################################################################
-defaultParams = {'obsTime':'28800', 'Ncore':'24', 'Nremote':'14',
-                 'Nint':'13', 'Nchan':'64', 'Nsb':'488',
-                 'intTime':'1', 'hbaDual':'hbadualinner',
+defaultParams = {'obsTime':'28800', 
+                 'Ncore':'24', 
+                 'Nremote':'14',
+                 'Nint':'14', 
+                 'Nchan':'64', 
+                 'Nsb':'488',
+                 'intTime':'1', 
+                 'hbaDual':'hbadualinner',
                  
-                 'pipeType':'none', 'tAvg':'1', 'fAvg':'1', 
+                 'pipeType':'none', 
+                 'tAvg':'1', 
+                 'fAvg':'1', 
                  'dyCompress':'enable',
                  
-                 'targetName':'', 'target_coord':'',
+                 'targetName':'', 
+                 'target_coord':'',
                 }
 
 ###############################################################################
@@ -101,23 +88,23 @@ obsTime = dbc.FormGroup([
             )
           ], row=True)
 Ncore = dbc.FormGroup([
-            dbc.Label('Number of core stations', width=labelWidth),
+            dbc.Label('No. of core stations (0 - 24)', width=labelWidth),
             dbc.Col(
-                dbc.Input(type='number', id='nCoreRow', min=0, max=24),
+                dbc.Input(type='number', id='nCoreRow'),
                 width=inpWidth
             )
         ], row=True)
 Nremote = dbc.FormGroup([
-            dbc.Label('Number of remote stations', width=labelWidth),
+            dbc.Label('No. of remote stations (0 - 14)', width=labelWidth),
             dbc.Col(
-                dbc.Input(type='number', id='nRemoteRow', min=0, max=14), 
+                dbc.Input(type='number', id='nRemoteRow'), 
                 width=inpWidth
             )            
         ], row=True)
 Nint = dbc.FormGroup([
-            dbc.Label('Number of international stations', width=labelWidth),
+            dbc.Label('No. of international stations (0 - 14)', width=labelWidth),
             dbc.Col(
-                dbc.Input(type='number', id='nIntRow', min=0, max=13), 
+                dbc.Input(type='number', id='nIntRow'), 
                 width=inpWidth
             )
         ], row=True)
@@ -326,6 +313,8 @@ warntext = \
 """
 **Notes:**
 
+The various features of this calculator are documented on the [LOFAR Imaging Cookbook](https://support.astron.nl/LOFARImagingCookbook/calculator.html).
+
 The sensitivity calculation performed by this tool follow [SKA Memo 113](http://www.skatelescope.org/uploaded/59513_113_Memo_Nijboer.pdf) by Nijboer, Pandey-Pommier & de Bruyn. It uses theoretical SEFD values. So, please use it with caution.
 
 LUCI (version 20191008) was written and is maintained for the LOFAR Science Operations & Support group by Sarrvesh Sridhar. The source code is publicly available on [GitHub](https://github.com/scisup/LOFAR-calculator). For comments and/or feature requests, please contact the Science Operations & Support group using the [Helpdesk](https://support.astron.nl/rohelpdesk).
@@ -355,8 +344,15 @@ graph = dbc.Row([
            dbc.Col(
               html.Div([
                  dcc.Graph(id='beam-plot', 
-                           figure={'layout':{'title':'Sample title'}},
-                           style={'height':600}
+                           figure={'layout':{'title':'Beam Layout'}},
+                           style={'height':600},
+                           config={
+                              'modeBarButtonsToRemove':\
+                                  ['toggleSpikelines', \
+                                   'hoverCompareCartesian', \
+                                   'hoverClosestCartesian' \
+                                  ]
+                           }
                  )
               ]), width=5
            )
@@ -372,6 +368,6 @@ layout = html.Div([dbc.Row(dbc.Col(header)),
                    ]),
                    graph,
                      
-                   msgBoxObsT, msgBoxnSB, msgBoxIntT, msgBoxTAvg, msgBoxFAvg,
+                   msgBoxTAvg, msgBoxFAvg,
                    msgBoxResolve, msgBoxGenPdf, msgBox
          ])

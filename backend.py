@@ -98,10 +98,15 @@ def calculate_proc_size(obsT, intTime, nBaselines, nChan, nSB, pipeType, tAvg,
    else:
       pass
 
-def validate_inputs(obsT, nSB, integT, tAvg, fAvg, srcName, coord):
+def validate_inputs(obsT, nCore, nRemote, nInt, nSB, integT, tAvg, 
+                    fAvg, srcName, coord):
    """Valid text input supplied by the user: observation time, number of 
       subbands, and integration time. Following checks will be performed:
          - obsTime is a valid positive number
+         - nCore is not None
+         - nRemote is not None
+         - nInt is not None
+         - nCore+nRemote+nInt is at least 1
          - nSB is an integer and is at least 1 or greater
          - integT is a valid positive number
          - tAvg is an integer
@@ -118,11 +123,22 @@ def validate_inputs(obsT, nSB, integT, tAvg, fAvg, srcName, coord):
          msg += 'Observation time cannot be zero or negative.\n'
    except ValueError:
       msg += 'Invalid observation time specified.\n'
+   # Validate the number of stations
+   if nCore < 0 or nCore > 24:
+      msg += 'Number of core stations must be between 0 and 24.\n'
+   if nRemote < 0 or nRemote > 14:
+      msg += 'Number of remote stations must be between 0 and 14.\n'
+   if nInt < 0 or nInt > 14:
+      msg += 'Number of international stations must be between 0 and 14.\n'
+   if nCore + nRemote + nInt < 1:
+      msg += 'At least 1 station must be included.\n'
    # Validate the number of subbands
    try:
       int(nSB)
       if int(nSB) < 1:
          msg += 'Number of subbands cannot be less than 1.\n'
+      if int(nSB) > 488:
+         msg += 'Number of subbands cannot be larger than 488.\n'
    except ValueError:
       msg += 'Invalid number of subbands specified.\n'
    # Validate integration time
