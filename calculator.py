@@ -7,6 +7,7 @@ import dash
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
+import flask
 import plotly.graph_objs as go
 from gui import layout
 from gui import header, obsGUIFrame, pipeGUIFrame, resultGUIFrame
@@ -16,7 +17,9 @@ import targetvis as tv
 import generatepdf as g
 
 # Initialize the dash app
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LUMEN])
+server = flask.Flask(__name__)
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LUMEN], \
+                server=server)
 
 #######################################
 # Setup the layout of the web interface
@@ -382,4 +385,4 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
                   False, displayFig, elevationFig, displayFig, beamFig
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=True, host='0.0.0.0', port=8051)
