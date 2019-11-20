@@ -224,11 +224,20 @@ def on_genpdf_click(n_clicks, closeMsgBox, obsT, nCore, nRemote, nInt, nChan,
          # Generate a relative and absolute filenames to the pdf file
          relPath = os.path.join(relPath, 'summary.pdf')
          absPath = os.path.join(os.getcwd(), relPath)
+         print(relPath)
+         print(absPath)
          g.generatepdf(relPath, obsT, nCore, nRemote, nInt, nChan,
                     nSb, integT, antSet, pipeType, tAvg, fAvg, isDysco, 
                     imNoiseVal, rawSize, procSize, pipeTime, elevation_fig,
                     isMsgBoxOpen)
-         return {'display':'block'}, relPath, False
+         return {'display':'block'}, '/{}'.format(relPath), False
+"""
+@server.route('/static/<path:path>')
+def serve_static(relPath):
+    absPath = os.path.join(os.getcwd(), relPath)
+    print(absPath)
+    return flask.send_from_directory(absPath)
+"""
 
 #######################################
 # What should the reset button do?
