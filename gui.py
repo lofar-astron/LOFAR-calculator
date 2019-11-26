@@ -213,17 +213,22 @@ pipeGUISetup = dbc.Form([pipeType, tAvg, fAvg, dyCompress])
 ###############################################################################
 # Define the layout of the target setup
 ###############################################################################
+targetToolTip = 'Multiple co-observing targets can be specified as ' + \
+                'comma-separated values. Note that the number of targets ' + \
+                '(pointings) times the number of subbands must be less than 488.'
 targetName = dbc.FormGroup([
                 dbc.Label('Target', width=labelWidth-inpWidth, 
                           id='targetNameRowL'
                 ),
+                dbc.Tooltip(targetToolTip, target='targetNameRowL'),
+                dbc.Tooltip(targetToolTip, target='targetNameRow'),
                 dbc.Col(
                    dbc.Input(id='targetNameRow', min=0), 
                    width=inpWidth
                 ),
                 dbc.Col(
                    dbc.Button('Resolve', id='resolve', color='dark')
-                )
+                ),
              ], row=True)
 targetCoord = dbc.FormGroup([
                  dbc.Label('Coordinates', width=labelWidth-inpWidth),
