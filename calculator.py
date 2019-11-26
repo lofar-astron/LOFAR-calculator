@@ -230,13 +230,13 @@ def on_genpdf_click(n_clicks, closeMsgBox, obsT, nCore, nRemote, nInt, nChan,
                     nSb, integT, antSet, pipeType, tAvg, fAvg, isDysco, 
                     imNoiseVal, rawSize, procSize, pipeTime, elevation_fig,
                     isMsgBoxOpen)
-         return {'display':'block'}, '/{}'.format(relPath), False
+         return {'display':'block'}, '/luci/{}'.format(relPath), False
+
 """
-@server.route('/static/<path:path>')
+@app.server.route('/static/<path:path>')
 def serve_static(relPath):
-    absPath = os.path.join(os.getcwd(), relPath)
-    print(absPath)
-    return flask.send_from_directory(absPath)
+    path = os.path.join(os.getcwd(), 'static')
+    return flask.send_from_directory(path, relPath)
 """
 
 #######################################
