@@ -378,6 +378,18 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
            else:
               # User has specified a coordinate and it has passed validation
               # in the validate_inputs function.
+              # Check if the number of SAPs is less than 488
+              if calibNames is None:
+                 nPoint = len(coord)
+              else:
+                 nPoint = len(coord) - len(calibNames)
+              nSAP = nPoint * int(nSB)
+              maxSAP = 487
+              if nSAP > maxSAP:
+                 msg = 'Number of targets times number of subbands cannot ' + \
+                       'be greater than {}.'.format(maxSAP)
+                 return '', '', '', '', msg, True, \
+                  {'display':'none'}, {}, {'display':'none'}, {}
               # Find target elevation across a 24-hour period
               data = tv.findTargetElevation(srcName, coord, obsDate)
               displayFig = {'display':'block', 'height':600}
