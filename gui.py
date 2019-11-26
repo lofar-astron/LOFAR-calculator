@@ -141,9 +141,14 @@ hbaDual = dbc.FormGroup([
           ], row=True)
 buttons = html.Div([
             dbc.Row([
-                dbc.Col(dbc.Button('Calculate', id='calculate', color='dark')),
-                dbc.Col(dbc.Button('Reset inputs', id='reset', color='dark')),
-                dbc.Col(dbc.Button('Generate PDF', id='genpdf', color='dark'))
+                dbc.Col(
+                   dbc.Button('Calculate', id='calculate', color='dark'),
+                   width={'offset':2}
+                ),
+                dbc.Col(
+                   dbc.Button('Generate PDF', id='genpdf', color='dark'),
+                   width={'offset':2}
+                )
             ])
           ])
 link = html.Div([
