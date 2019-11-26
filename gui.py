@@ -241,8 +241,11 @@ obsDate = dbc.FormGroup([
                                           id='dateRow')
              )
           ], row=True)
+calListToolTip = 'Calibrators are not taken into account in the final data sizes'
 calList = dbc.FormGroup([
-             dbc.Label('Calibrators', width=labelWidth-inpWidth),
+             dbc.Label('Calibrators', width=labelWidth-inpWidth, id='calListRowL'),
+             dbc.Tooltip(calListToolTip, target='calListRowL'),
+             dbc.Tooltip(calListToolTip, target='calListRow'),
              dbc.Col(dcc.Dropdown(
                         options=[
                              {'label':'3C48', 'value':'3C48'},
