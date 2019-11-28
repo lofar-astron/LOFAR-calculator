@@ -227,12 +227,10 @@ def on_genpdf_click(n_clicks, closeMsgBox, obsT, nCore, nRemote, nInt, nChan,
                     isMsgBoxOpen)
          return {'display':'block'}, '/luci/{}'.format(relPath), False
 
-"""
-@app.server.route('/static/<path:path>')
-def serve_static(relPath):
+@app.server.route('/luci/static/<resource>')
+def serve_static(resource):
     path = os.path.join(os.getcwd(), 'static')
-    return flask.send_from_directory(path, relPath)
-"""
+    return flask.send_from_directory(path, resource)
 
 #######################################
 # What should the reset button do?
