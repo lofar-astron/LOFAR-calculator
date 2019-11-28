@@ -245,7 +245,6 @@ calListToolTip = 'Calibrators are not taken into account in the final data sizes
 calList = dbc.FormGroup([
              dbc.Label('Calibrators', width=labelWidth-inpWidth, id='calListRowL'),
              dbc.Tooltip(calListToolTip, target='calListRowL'),
-             dbc.Tooltip(calListToolTip, target='calListRow'),
              dbc.Col(dcc.Dropdown(
                         options=[
                              {'label':'3C48', 'value':'3C48'},
@@ -255,7 +254,8 @@ calList = dbc.FormGroup([
                         ], searchable=True, clearable=True, 
                            id='calListRow', multi=True
                      ), width=dropWidth
-             )
+             ),
+             dbc.Tooltip(calListToolTip, target='calListRow')
           ], row=True)
 demixList = dbc.FormGroup([
                dbc.Label('A-team sources', width=labelWidth-inpWidth),
