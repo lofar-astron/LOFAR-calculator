@@ -141,14 +141,9 @@ hbaDual = dbc.FormGroup([
           ], row=True)
 buttons = html.Div([
             dbc.Row([
-                dbc.Col(
-                   dbc.Button('Calculate', id='calculate', color='dark'),
-                   width={'offset':2}
-                ),
-                dbc.Col(
-                   dbc.Button('Generate PDF', id='genpdf', color='dark'),
-                   width={'offset':2}
-                )
+                dbc.Col(dbc.Button('Calculate', id='calculate', color='dark')),
+                dbc.Col(dbc.Button('Reset inputs', id='reset', color='dark')),
+                dbc.Col(dbc.Button('Generate PDF', id='genpdf', color='dark'))
             ])
           ])
 link = html.Div([
@@ -250,7 +245,6 @@ calListToolTip = 'Calibrators are not taken into account in the final data sizes
 calList = dbc.FormGroup([
              dbc.Label('Calibrators', width=labelWidth-inpWidth, id='calListRowL'),
              dbc.Tooltip(calListToolTip, target='calListRowL'),
-             dbc.Tooltip(calListToolTip, target='calListRow'),
              dbc.Col(dcc.Dropdown(
                         options=[
                              {'label':'3C48', 'value':'3C48'},

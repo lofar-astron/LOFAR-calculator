@@ -11,7 +11,7 @@ import flask
 import plotly.graph_objs as go
 from gui import layout
 from gui import header, obsGUIFrame, pipeGUIFrame, resultGUIFrame
-from gui import msgBox
+from gui import defaultParams, msgBox
 import backend as bk
 import targetvis as tv
 import generatepdf as g
@@ -27,6 +27,7 @@ app.scripts.config.serve_locally = True
 # Setup the layout of the web interface
 #######################################
 app.layout = layout
+app.title = 'LUCI - LOFAR Unified Calculator for Imaging'
 
 ##############################################
 # TODO: Move all callbacks to a separate file
@@ -217,27 +218,51 @@ def on_genpdf_click(n_clicks, closeMsgBox, obsT, nCore, nRemote, nInt, nChan,
       else:
          # Generate a random number so that this user's pdf can be stored here 
          randnum = '{:05d}'.format(randint(0,10000))
-         relPath = os.path.join('static', randnum)
-         # Create this folder
-         absPath = os.path.join(os.getcwd(), relPath)
-         os.mkdir(absPath)
+         relPath = 'static/'
          # Generate a relative and absolute filenames to the pdf file
-         relPath = os.path.join(relPath, 'summary.pdf')
+         relPath = os.path.join(relPath, 'summary_{}.pdf'.format(randnum))
          absPath = os.path.join(os.getcwd(), relPath)
-         print(relPath)
-         print(absPath)
          g.generatepdf(relPath, obsT, nCore, nRemote, nInt, nChan,
                     nSb, integT, antSet, pipeType, tAvg, fAvg, isDysco, 
                     imNoiseVal, rawSize, procSize, pipeTime, elevation_fig,
                     isMsgBoxOpen)
          return {'display':'block'}, '/luci/{}'.format(relPath), False
 
-"""
-@app.server.route('/static/<path:path>')
-def serve_static(relPath):
+@app.server.route('/luci/static/<resource>')
+def serve_static(resource):
     path = os.path.join(os.getcwd(), 'static')
-    return flask.send_from_directory(path, relPath)
-"""
+    return flask.send_from_directory(path, resource)
+
+#######################################
+# What should the reset button do?
+#######################################
+@app.callback(
+    [  Output('obsTimeRow', 'value'),
+       Output('nCoreRow',   'value'),
+       Output('nRemoteRow','value'),
+       Output('nIntRow','value'),
+       Output('nChanRow','value'),
+       Output('nSbRow','value'),
+       Output('intTimeRow','value'),
+
+       Output('tAvgRow','value'),
+       Output('fAvgRow','value'),
+
+       Output('hbaDualRow','value'),
+       Output('pipeTypeRow','value'),
+       Output('dyCompressRow','value')
+
+    ],
+    [Input('reset', 'n_clicks')]
+)
+def on_reset_click(n):
+   """Function defines what to do when the reset button is clicked"""
+   return defaultParams['obsTime'], defaultParams['Ncore'], \
+          defaultParams['Nremote'], defaultParams['Nint'], \
+          defaultParams['Nchan'], defaultParams['Nsb'], \
+          defaultParams['intTime'], defaultParams['tAvg'], \
+          defaultParams['fAvg'], defaultParams['hbaDual'], \
+          defaultParams['pipeType'], defaultParams['dyCompress']
 
 #######################################
 # What should the submit button do?
@@ -353,7 +378,7 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
               else:
                  nPoint = len(coord) - len(calibNames)
               nSAP = nPoint * int(nSB)
-              maxSAP = 487
+              maxSAP = 488
               if nSAP > maxSAP:
                  msg = 'Number of targets times number of subbands cannot ' + \
                        'be greater than {}.'.format(maxSAP)
@@ -377,4 +402,5 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
                   False, displayFig, elevationFig, displayFig, beamFig
 
 if __name__ == '__main__':
-    app.run_server(debug=True, host='0.0.0.0', port=8051)
+    app.run_server(debug=False, host='0.0.0.0', port=8051, \
+                   dev_tools_ui=False, dev_tools_props_check=False)
