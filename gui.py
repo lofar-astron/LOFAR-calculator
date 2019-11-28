@@ -254,8 +254,7 @@ calList = dbc.FormGroup([
                         ], searchable=True, clearable=True, 
                            id='calListRow', multi=True
                      ), width=dropWidth
-             ),
-             dbc.Tooltip(calListToolTip, target='calListRow')
+             )
           ], row=True)
 demixList = dbc.FormGroup([
                dbc.Label('A-team sources', width=labelWidth-inpWidth),
