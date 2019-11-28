@@ -27,6 +27,7 @@ app.scripts.config.serve_locally = True
 # Setup the layout of the web interface
 #######################################
 app.layout = layout
+app.title = 'LUCI - LOFAR Unified Calculator for Imaging'
 
 ##############################################
 # TODO: Move all callbacks to a separate file
