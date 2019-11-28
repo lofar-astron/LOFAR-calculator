@@ -377,7 +377,7 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
               else:
                  nPoint = len(coord) - len(calibNames)
               nSAP = nPoint * int(nSB)
-              maxSAP = 487
+              maxSAP = 488
               if nSAP > maxSAP:
                  msg = 'Number of targets times number of subbands cannot ' + \
                        'be greater than {}.'.format(maxSAP)
