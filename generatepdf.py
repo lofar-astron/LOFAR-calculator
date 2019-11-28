@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from fpdf import FPDF, HTMLMixin
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
+import os
 
 # Dummy class needed to generate the PDF file
 class MyFPDF(FPDF, HTMLMixin): pass
@@ -102,9 +103,14 @@ def generatepdf(pdffile, obsT, nCore, nRemote, nInt, nChan, nSb, integT,
       string += '<center>'
       string += '<img src={} width=400 height=250>'.format(pngfilename)
       string += '</center>'
+      
    
    # Write text to the pdf file
    pdf.write_html(string)
    
    # Write the pdf to disk
    pdf.output(pdffile)
+   
+   # Remove the temporary PNG file from disk
+   if elevation_fig != {}:
+      os.remove(pngfilename)
