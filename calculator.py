@@ -11,7 +11,7 @@ import flask
 import plotly.graph_objs as go
 from gui import layout
 from gui import header, obsGUIFrame, pipeGUIFrame, resultGUIFrame
-from gui import msgBox
+from gui import defaultParams, msgBox
 import backend as bk
 import targetvis as tv
 import generatepdf as g
@@ -238,6 +238,37 @@ def serve_static(relPath):
     path = os.path.join(os.getcwd(), 'static')
     return flask.send_from_directory(path, relPath)
 """
+
+#######################################
+# What should the reset button do?
+#######################################
+@app.callback(
+    [  Output('obsTimeRow', 'value'),
+       Output('nCoreRow',   'value'),
+       Output('nRemoteRow','value'),
+       Output('nIntRow','value'),
+       Output('nChanRow','value'),
+       Output('nSbRow','value'),
+       Output('intTimeRow','value'),
+
+       Output('tAvgRow','value'),
+       Output('fAvgRow','value'),
+
+       Output('hbaDualRow','value'),
+       Output('pipeTypeRow','value'),
+       Output('dyCompressRow','value')
+
+    ],
+    [Input('reset', 'n_clicks')]
+)
+def on_reset_click(n):
+   """Function defines what to do when the reset button is clicked"""
+   return defaultParams['obsTime'], defaultParams['Ncore'], \
+          defaultParams['Nremote'], defaultParams['Nint'], \
+          defaultParams['Nchan'], defaultParams['Nsb'], \
+          defaultParams['intTime'], defaultParams['tAvg'], \
+          defaultParams['fAvg'], defaultParams['hbaDual'], \
+          defaultParams['pipeType'], defaultParams['dyCompress']
 
 #######################################
 # What should the submit button do?
