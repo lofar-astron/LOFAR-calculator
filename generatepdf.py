@@ -96,11 +96,11 @@ def generatepdf(pdffile, obsT, nCore, nRemote, nInt, nChan, nSb, integT,
    # visibility plot
    if elevation_fig != {}:
       # User has specified at least one source in the target setup
-      pdffilename = pdffile.replace('summary.pdf', 'plot.png')
-      makePdfPlot(elevation_fig, pdffilename)
+      pngfilename = pdffile.replace('summary', 'plot').replace('pdf', 'png')
+      makePdfPlot(elevation_fig, pngfilename)
       # Add the elevation plot to html
       string += '<center>'
-      string += '<img src={} width=400 height=250>'.format(pdffilename)
+      string += '<img src={} width=400 height=250>'.format(pngfilename)
       string += '</center>'
    
    # Write text to the pdf file
