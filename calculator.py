@@ -401,4 +401,5 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
                   False, displayFig, elevationFig, displayFig, beamFig
 
 if __name__ == '__main__':
-    app.run_server(debug=True, host='0.0.0.0', port=8051)
+    app.run_server(debug=False, host='0.0.0.0', port=8051, \
+                   dev_tools_ui=False, dev_tools_props_check=False)
