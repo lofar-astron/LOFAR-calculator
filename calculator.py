@@ -217,15 +217,10 @@ def on_genpdf_click(n_clicks, closeMsgBox, obsT, nCore, nRemote, nInt, nChan,
       else:
          # Generate a random number so that this user's pdf can be stored here 
          randnum = '{:05d}'.format(randint(0,10000))
-         relPath = os.path.join('static', randnum)
-         # Create this folder
-         absPath = os.path.join(os.getcwd(), relPath)
-         os.mkdir(absPath)
+         relPath = 'static/'
          # Generate a relative and absolute filenames to the pdf file
-         relPath = os.path.join(relPath, 'summary.pdf')
+         relPath = os.path.join(relPath, 'summary_{}.pdf'.format(randnum))
          absPath = os.path.join(os.getcwd(), relPath)
-         print(relPath)
-         print(absPath)
          g.generatepdf(relPath, obsT, nCore, nRemote, nInt, nChan,
                     nSb, integT, antSet, pipeType, tAvg, fAvg, isDysco, 
                     imNoiseVal, rawSize, procSize, pipeTime, elevation_fig,
