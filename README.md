@@ -1,7 +1,16 @@
 # LOFAR-calculator
-Data size and processing time calculator for LOFAR
+A unified web interface for planning imaging observations with LOFAR.
 
 ## Dependencies
 ```
-pip install dash dash-bootstrap-components numpy astroquery astropy fpdf ephem matplotlib
+pip install -r requirements.txt
+```
+
+To run the calculator locally, run the following command
+```
+python calculator.py
+```
+and point your browser at 
+```
+0.0.0.0:8051/luci/
 ```
