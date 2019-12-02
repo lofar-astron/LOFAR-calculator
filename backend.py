@@ -99,7 +99,7 @@ def calculate_proc_size(obsT, intTime, nBaselines, nChan, nSB, pipeType, tAvg,
       pass
 
 def validate_inputs(obsT, nCore, nRemote, nInt, nSB, integT, tAvg, 
-                    fAvg, srcName, coord):
+                    fAvg, srcName, coord, hbaMode):
    """Valid text input supplied by the user: observation time, number of 
       subbands, and integration time. Following checks will be performed:
          - obsTime is a valid positive number
@@ -113,6 +113,7 @@ def validate_inputs(obsT, nCore, nRemote, nInt, nSB, integT, tAvg,
          - fAvg is an integer
          - srcName is a string
          - coord is a valid AstroPy coordinate
+         - While observing with HBA, check if the targets are inside the tile beam.
       Return state=True/False accompanied by an error msg
       Note: all input parameters are still strings."""
    msg = ''
@@ -130,8 +131,8 @@ def validate_inputs(obsT, nCore, nRemote, nInt, nSB, integT, tAvg,
       msg += 'Number of remote stations must be between 0 and 14.\n'
    if nInt < 0 or nInt > 14:
       msg += 'Number of international stations must be between 0 and 14.\n'
-   if nCore + nRemote + nInt < 1:
-      msg += 'At least 1 station must be included.\n'
+   if nCore + nRemote + nInt < 2:
+      msg += 'At least 2 station must be included.\n'
    # Validate the number of subbands
    try:
       int(nSB)
@@ -170,6 +171,19 @@ def validate_inputs(obsT, nCore, nRemote, nInt, nSB, integT, tAvg,
       except:
          msg += 'Invalid coodinate value under Target setup. Please make ' +\
                 'sure it is compatible with the AstroPy formats.'
+   # While observing with HBA, check if the specified targets all lie within 10 deg
+   coord_list = coord.split(',')
+   if 'hba' in hbaMode and len(coord_list) > 1:
+      refPoint = SkyCoord(coord_list[0])
+      angDistance = []
+      for i in range(1, len(coord_list)):
+         thisPoint = SkyCoord(coord_list[i])
+         angDistance.append(thisPoint.separation(refPoint).deg)
+      maxDistance = np.max(np.asarray(angDistance))
+      if maxDistance > 10.:
+         msg += 'Maximum angular separation between specified target pointings ' + \
+                'is {:.2f} degrees. This is not allowed while '.format(maxDistance) + \
+                'observing with the High Band Antenna'
    # If any error has been triggered above, return the error message
    if msg is not '':
       return False, msg

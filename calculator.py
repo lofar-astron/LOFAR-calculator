@@ -327,7 +327,7 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
         if nInt is None: nInt = '0'
         status, msg = bk.validate_inputs(obsT, int(nCore), int(nRemote), \
                                          int(nInt), nSB, integT, tAvg, fAvg, \
-                                         srcName, coord)
+                                         srcName, coord, hbaMode)
         if status is False:
            return '', '', '', '', msg, True, \
                   {'display':'none'}, {}, {'display':'none'}, {}
