@@ -150,6 +150,8 @@ def resolve_source(names):
          dec= query['DEC'][0]
          coord = SkyCoord('{} {}'.format(ra, dec), unit=(u.hourangle, u.deg))
          retString.append( coord.to_string('hmsdms') )
+      # Convert the list to a comma separated list before returning
+      retString = ','.join(retString)
    except:
       retString = None
    return retString

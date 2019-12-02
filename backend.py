@@ -161,12 +161,12 @@ def validate_inputs(obsT, nCore, nRemote, nInt, nSB, integT, tAvg,
    # Validate the coordinates specified under target setup
    if coord is not '':
       # Warn if the number of targets do not match the number of coordinates
-      if len(srcName.split(',')) != len(coord):
+      if len(srcName.split(',')) != len(coord.split(',')):
          msg += 'Number of target names do not match the number of coordinates. '
       # Check if the coordinates are valid
       try:
-         for i in range(len(coord)):
-            SkyCoord(coord[i])
+         for i in range(len(coord.split(','))):
+            SkyCoord(coord.split(',')[i])
       except:
          msg += 'Invalid coodinate value under Target setup. Please make ' +\
                 'sure it is compatible with the AstroPy formats.'

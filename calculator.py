@@ -342,16 +342,20 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
            avgSize = bk.calculate_proc_size(float(obsT), float(integT), nBaselines,
                                             int(nChan), int(nSB), pipeType, 
                                             int(tAvg), int(fAvg), dyCompress)
+
+           # It is useful to have coord as a list from now on
+           coord_list = coord.split(',')
+
            # Add calibrator names to the target list so that they can be 
            # plotted together
            if calibNames is not None:
               for i in range(len(calibNames)):
                  if i == 0 and srcName is None:
                     srcName = '{}'.format( calibNames[i] )
-                    coord = [ tv.calib_coordinates[calibNames[i]] ]
+                    coord_list = [ tv.calib_coordinates[calibNames[i]] ]
                  else:
                     srcName += ', {}'.format( calibNames[i] )
-                    coord.append( tv.calib_coordinates[calibNames[i]] )
+                    coord_list.append( tv.calib_coordinates[calibNames[i]] )
            
            # Add A-team names to the target list so that they can be 
            # plotted together
@@ -359,12 +363,12 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
               for i in range(len(ateamNames)):
                  if i == 0 and srcName is None:
                     srcName = '{}'.format( ateamNames[i] )
-                    coord = [ tv.ateam_coordinates[ateamNames[i]] ]
+                    coord_list = [ tv.ateam_coordinates[ateamNames[i]] ]
                  else:
                     srcName += ', {}'.format( ateamNames[i] )
-                    coord.append( tv.ateam_coordinates[ateamNames[i]] )
+                    coord_list.append( tv.ateam_coordinates[ateamNames[i]] )
            
-           if coord is '':
+           if coord_list is '':
               # No source is specified under Target setup
               displayFig = {'display':'none'}
               elevationFig = {}
@@ -374,9 +378,9 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
               # in the validate_inputs function.
               # Check if the number of SAPs is less than 488
               if calibNames is None:
-                 nPoint = len(coord)
+                 nPoint = len(coord_list)
               else:
-                 nPoint = len(coord) - len(calibNames)
+                 nPoint = len(coord_list) - len(calibNames)
               nSAP = nPoint * int(nSB)
               maxSAP = 488
               if nSAP > maxSAP:
@@ -385,7 +389,7 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
                  return '', '', '', '', msg, True, \
                   {'display':'none'}, {}, {'display':'none'}, {}
               # Find target elevation across a 24-hour period
-              data = tv.findTargetElevation(srcName, coord, obsDate)
+              data = tv.findTargetElevation(srcName, coord_list, obsDate)
               displayFig = {'display':'block', 'height':600}
               elevationFig = {'data':data,
                               'layout':go.Layout(
@@ -395,12 +399,13 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
                                        )
                              }
               # Find the position of the station and tile beam 
-              beamFig = tv.findBeamLayout(srcName, coord, int(nCore), \
+              beamFig = tv.findBeamLayout(srcName, coord_list, int(nCore), \
                                        int(nRemote), int(nInt), hbaMode)
 
            return imNoise, rawSize, avgSize, 0, '', \
                   False, displayFig, elevationFig, displayFig, beamFig
 
 if __name__ == '__main__':
+    #app.run_server(debug=True, host='0.0.0.0', port=8051)
     app.run_server(debug=False, host='0.0.0.0', port=8051, \
                    dev_tools_ui=False, dev_tools_props_check=False)
