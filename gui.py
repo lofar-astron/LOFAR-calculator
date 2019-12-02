@@ -109,10 +109,16 @@ Nint = dbc.FormGroup([
             )
         ], row=True)
 Nchan = dbc.FormGroup([
-            dbc.Label('Number of channels per subband', width=labelWidth),
-            dbc.Col(
-                dbc.Input(type='number', id='nChanRow', min=1, max=256), width=inpWidth
-            )
+          dbc.Label('Number of channels per subband', width=labelWidth),
+          dbc.Col(
+            dcc.Dropdown(
+                options=[
+                    {'label':'64', 'value':'64'},
+                    {'label':'128', 'value':'128'},
+                    {'label':'256', 'value':'256'}
+                ], value='64', searchable=False, clearable=False, id='nChanRow'
+            ), width=dropWidth
+          )
         ], row=True)
 Nsb = dbc.FormGroup([
             dbc.Label('Number of subbands', width=labelWidth),
