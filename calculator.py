@@ -347,7 +347,10 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
            coord_list = coord.split(',')
 
            # Add calibrator names to the target list so that they can be 
-           # plotted together
+           # plotted together. Before doing that, make a copy of the input 
+           # target list and its coordinates
+           srcNameInput = srcName
+           coordInput = coord
            if calibNames is not None:
               for i in range(len(calibNames)):
                  if i == 0 and srcName is None:
@@ -399,8 +402,8 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
                                        )
                              }
               # Find the position of the station and tile beam 
-              beamFig = tv.findBeamLayout(srcName, coord_list, int(nCore), \
-                                       int(nRemote), int(nInt), hbaMode)
+              beamFig = tv.findBeamLayout(srcNameInput, coordInput, \
+                                   int(nCore), int(nRemote), int(nInt), hbaMode)
 
            return imNoise, rawSize, avgSize, 0, '', \
                   False, displayFig, elevationFig, displayFig, beamFig

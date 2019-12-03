@@ -87,16 +87,23 @@ def getAxesRange(layout):
 def findBeamLayout(srcName, coord, nCore, nRemote, nInt, antenna_mode):
    """For a given set of source coordinates, station list, and array mode,
       generate a plotly Data object for the dipole/tile/station beams"""
+   srcNameList = srcName.split(',')
+   coordList = coord.split(',')
    station_beam_size = getStationBeamSize(nCore, nRemote, nInt, antenna_mode)/2
-   # Create an initial layout object
+   # Create an initial layout and data object
    layout = {'shapes': [], 
              'xaxis':{'title':'Right Ascension (degree)'}, 
              'yaxis':{'title':'Declination (degree)'},
-             'title':'Beam layout'
+             'title':'Beam layout',
+             'showlegend': False
             }
+   data = []
+   
+   LABEL_OFFSET = 0.5
    
    # Iterate over coord and plot the station beam
-   for c in coord:
+   index = 0
+   for c in coordList:
       s_beam = SkyCoord(c)
       layout['shapes'].append(
          {
@@ -110,11 +117,19 @@ def findBeamLayout(srcName, coord, nCore, nRemote, nInt, antenna_mode):
          'line': {'color':'rgba(50, 171, 96, 1)'}            
          }
       )
+      data.append(
+        Scatter(x=[s_beam.ra.deg], 
+                y=[s_beam.dec.deg+station_beam_size+LABEL_OFFSET],
+                text=[srcNameList[index]], 
+                mode='text'
+        )
+      )
+      index += 1
       
-   # If antenna_mode is hba, point the station beam
+   # If antenna_mode is hba, plot the tile beam
    if 'hba' in antenna_mode:   
       # Calculate the reference tile beam 
-      t_beam = getTileBeam(coord)
+      t_beam = getTileBeam(coordList)
       layout['shapes'].append(
          {
          'type':'circle',
@@ -127,6 +142,13 @@ def findBeamLayout(srcName, coord, nCore, nRemote, nInt, antenna_mode):
          'line': {'color':'rgba(250, 0, 250, 1)'}            
          }
       )
+      data.append( 
+        Scatter(x=[t_beam.ra.deg], 
+                y=[t_beam.dec.deg+tile_beam_size/2 + LABEL_OFFSET],
+                text=['Station beam'], 
+                mode='text'
+        ) 
+      )
    
    # Set the axes range to display
    bufsize = 2 # Buffer space in degrees
@@ -134,10 +156,7 @@ def findBeamLayout(srcName, coord, nCore, nRemote, nInt, antenna_mode):
    # Swap xmin and xmax so that declination decreases to the right.
    layout['xaxis']['range'] = [xmax+bufsize,xmin-bufsize]
    layout['yaxis']['range'] = [ymin-bufsize,ymax+bufsize]
-   # We need to define plotly data is we want to reset/autoscale the axes.
-   # So, plot a single scatter point
-   data = Scatter(x=np.asarray(xmax), y=np.asarray(ymax), mode='lines')
-   return {'layout': layout, 'data':[data]}
+   return {'layout': layout, 'data':data}
 
 def resolve_source(names):
    """For a given source name, use astroquery to find its coordinates.
