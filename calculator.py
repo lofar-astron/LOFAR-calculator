@@ -342,9 +342,11 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
            avgSize = bk.calculate_proc_size(float(obsT), float(integT), nBaselines,
                                             int(nChan), int(nSB), pipeType, 
                                             int(tAvg), int(fAvg), dyCompress)
+           # TODO Calculate the processing time
 
            # It is useful to have coord as a list from now on
-           coord_list = coord.split(',')
+           if coord is not '':
+              coord_list = coord.split(',')
 
            # Add calibrator names to the target list so that they can be 
            # plotted together. Before doing that, make a copy of the input 
@@ -371,7 +373,7 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
                     srcName += ', {}'.format( ateamNames[i] )
                     coord_list.append( tv.ateam_coordinates[ateamNames[i]] )
            
-           if coord_list is '':
+           if coord is '':
               # No source is specified under Target setup
               displayFig = {'display':'none'}
               elevationFig = {}
@@ -380,7 +382,7 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
               # User has specified a coordinate and it has passed validation
               # in the validate_inputs function.
               # Check if the number of SAPs is less than 488
-              nPoint = len(srcNameInput.split(','))
+              nPoint = len(coord_list)
               nSAP = nPoint * int(nSB)
               maxSAP = 488
               if nSAP > maxSAP:
