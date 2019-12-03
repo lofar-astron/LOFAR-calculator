@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from astroquery.simbad import Simbad
 from astropy.coordinates import SkyCoord
 from astropy import units as u
-from ephem import Observer, FixedBody
+from ephem import Observer, FixedBody, Sun, Moon, Jupiter
 import numpy as np      
 from plotly.graph_objs import Scatter, Layout
 
@@ -187,7 +187,7 @@ def findTargetElevation(srcName, coord, obsDate):
    tempTime = startTime
    while(tempTime < endTime):
       xaxis.append(tempTime)
-      tempTime += timedelta(minutes=10)
+      tempTime += timedelta(minutes=5)
    
    # Create the telescope object
    # LOFAR coordinates were taken from Aleksandar's code
@@ -216,5 +216,40 @@ def findTargetElevation(srcName, coord, obsDate):
       # Create a Plotly Scatter object that can be plotted later
       retData.append( Scatter(x=xaxis, y=yaxis, mode='lines', 
                                line={}, name=srcNameList[i] ) )
+   # We should also plot Sun, Moon, and Jupiter by default
+   sun = Sun()
+   sun._epoch = '2000'
+   yaxis = []
+   for item in xaxis:
+      lofar.date = item
+      sun.compute(lofar)
+      elevation = float(sun.alt)*180./np.pi
+      if elevation < 0:
+         elevation = np.nan
+      yaxis.append(elevation)
+   retData.append( Scatter(x=xaxis, y=yaxis, mode='lines',
+                           line={}, name='Sun') )
+   moon = Moon()
+   yaxis = []
+   for item in xaxis:
+      lofar.date = item
+      moon.compute(lofar)
+      elevation = float(moon.alt)*180./np.pi
+      if elevation < 0:
+         elevation = np.nan
+      yaxis.append(elevation)
+   retData.append( Scatter(x=xaxis, y=yaxis, mode='lines',
+                           line={}, name='Moon') )
    
+   jupiter = Jupiter()
+   yaxis = []
+   for item in xaxis:
+      lofar.date = item
+      jupiter.compute(lofar)
+      elevation = float(jupiter.alt)*180./np.pi
+      if elevation < 0:
+         elevation = np.nan
+      yaxis.append(elevation)
+   retData.append( Scatter(x=xaxis, y=yaxis, mode='lines',
+                           line={}, name='Jupiter') )
    return retData
