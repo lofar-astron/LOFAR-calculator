@@ -234,37 +234,6 @@ def serve_static(resource):
     return flask.send_from_directory(path, resource)
 
 #######################################
-# What should the reset button do?
-#######################################
-@app.callback(
-    [  Output('obsTimeRow', 'value'),
-       Output('nCoreRow',   'value'),
-       Output('nRemoteRow','value'),
-       Output('nIntRow','value'),
-       Output('nChanRow','value'),
-       Output('nSbRow','value'),
-       Output('intTimeRow','value'),
-
-       Output('tAvgRow','value'),
-       Output('fAvgRow','value'),
-
-       Output('hbaDualRow','value'),
-       Output('pipeTypeRow','value'),
-       Output('dyCompressRow','value')
-
-    ],
-    [Input('reset', 'n_clicks')]
-)
-def on_reset_click(n):
-   """Function defines what to do when the reset button is clicked"""
-   return defaultParams['obsTime'], defaultParams['Ncore'], \
-          defaultParams['Nremote'], defaultParams['Nint'], \
-          defaultParams['Nchan'], defaultParams['Nsb'], \
-          defaultParams['intTime'], defaultParams['tAvg'], \
-          defaultParams['fAvg'], defaultParams['hbaDual'], \
-          defaultParams['pipeType'], defaultParams['dyCompress']
-
-#######################################
 # What should the submit button do?
 #######################################
 @app.callback(
@@ -408,6 +377,6 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
                   False, displayFig, elevationFig, displayFig, beamFig
 
 if __name__ == '__main__':
-    #app.run_server(debug=True, host='0.0.0.0', port=8051)
-    app.run_server(debug=False, host='0.0.0.0', port=8051, \
-                   dev_tools_ui=False, dev_tools_props_check=False)
+    app.run_server(debug=True, host='0.0.0.0', port=8051)
+    #app.run_server(debug=False, host='0.0.0.0', port=8051, \
+    #               dev_tools_ui=False, dev_tools_props_check=False)

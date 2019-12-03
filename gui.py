@@ -84,28 +84,37 @@ dropWidth = 4
 obsTime = dbc.FormGroup([
             dbc.Label('Observation time (in seconds)', width=labelWidth),
             dbc.Col(
-                dbc.Input(type='text', id='obsTimeRow'), width=inpWidth
+                dbc.Input(type='text', 
+                          id='obsTimeRow', 
+                          value=defaultParams['obsTime']
+                ), width=inpWidth
             )
           ], row=True)
 Ncore = dbc.FormGroup([
             dbc.Label('No. of core stations (0 - 24)', width=labelWidth),
             dbc.Col(
-                dbc.Input(type='number', id='nCoreRow'),
-                width=inpWidth
+                dbc.Input(type='number', 
+                          id='nCoreRow',
+                          value=defaultParams['Ncore']
+                ), width=inpWidth
             )
         ], row=True)
 Nremote = dbc.FormGroup([
             dbc.Label('No. of remote stations (0 - 14)', width=labelWidth),
             dbc.Col(
-                dbc.Input(type='number', id='nRemoteRow'), 
-                width=inpWidth
+                dbc.Input(type='number', 
+                          id='nRemoteRow',
+                          value=defaultParams['Nremote']
+                ), width=inpWidth
             )            
         ], row=True)
 Nint = dbc.FormGroup([
             dbc.Label('No. of international stations (0 - 14)', width=labelWidth),
             dbc.Col(
-                dbc.Input(type='number', id='nIntRow'), 
-                width=inpWidth
+                dbc.Input(type='number', 
+                          id='nIntRow',
+                          value=defaultParams['Nint']
+                ), width=inpWidth
             )
         ], row=True)
 Nchan = dbc.FormGroup([
@@ -116,20 +125,27 @@ Nchan = dbc.FormGroup([
                     {'label':'64', 'value':'64'},
                     {'label':'128', 'value':'128'},
                     {'label':'256', 'value':'256'}
-                ], value='64', searchable=False, clearable=False, id='nChanRow'
+                ], value=defaultParams['Nchan'], searchable=False, 
+                   clearable=False, id='nChanRow'
             ), width=dropWidth
           )
         ], row=True)
 Nsb = dbc.FormGroup([
             dbc.Label('Number of subbands', width=labelWidth),
             dbc.Col(
-                dbc.Input(type='text', id='nSbRow'), width=inpWidth
+                dbc.Input(type='number', 
+                          id='nSbRow',
+                          value=defaultParams['Nsb']
+                ), width=inpWidth
             )
         ], row=True)
 intTime = dbc.FormGroup([
             dbc.Label('Integration time (in seconds)', width=labelWidth),
             dbc.Col(
-                dbc.Input(type='text', id='intTimeRow'), width=inpWidth
+                dbc.Input(type='text', 
+                          id='intTimeRow',
+                          value=defaultParams['intTime']
+                ), width=inpWidth
             )
         ], row=True)
 hbaDual = dbc.FormGroup([
@@ -140,15 +156,15 @@ hbaDual = dbc.FormGroup([
                         {'label':'LBA Outer', 'value':'lbaouter'},
                         {'label':'HBA Dual', 'value':'hbadual'},
                         {'label':'HBA Dual Inner', 'value':'hbadualinner'}
-                    ], value='hbadualinner', searchable=False, 
+                    ], value=defaultParams['hbaDual'], searchable=False, 
                        clearable=False, id='hbaDualRow',
                 ), width=dropWidth
             )
           ], row=True)
 buttons = html.Div([
             dbc.Row([
+                dbc.Col(),
                 dbc.Col(dbc.Button('Calculate', id='calculate', color='dark')),
-                dbc.Col(dbc.Button('Reset inputs', id='reset', color='dark')),
                 dbc.Col(dbc.Button('Generate PDF', id='genpdf', color='dark'))
             ])
           ])
@@ -177,7 +193,7 @@ pipeType = dbc.FormGroup([
                         {'label':'None', 'value':'none'},
                         {'label':'Preprocessing', 'value':'preprocessing'},
                         #{'label':'Prefactor', 'value':'prefactor'}
-                    ], value='none', searchable=False, 
+                    ], value=defaultParams['pipeType'], searchable=False, 
                        clearable=False, id='pipeTypeRow'
                 ), width=dropWidth
             )
@@ -187,8 +203,11 @@ tAvg = dbc.FormGroup([
                      id='tAvgRowL'
            ),
            dbc.Col(
-            dbc.Input(type='number', id='tAvgRow', min=0), 
-            width=inpWidth
+            dbc.Input(type='number', 
+                      id='tAvgRow', 
+                      min=0,
+                      value=defaultParams['tAvg']
+            ), width=inpWidth
            )
        ], row=True)
 fAvg = dbc.FormGroup([
@@ -196,8 +215,11 @@ fAvg = dbc.FormGroup([
                      id='fAvgRowL'
            ),
            dbc.Col(
-            dbc.Input(type='number', id='fAvgRow', min=0), 
-            width=inpWidth
+            dbc.Input(type='number', 
+                      id='fAvgRow', 
+                      min=0,
+                      value=defaultParams['fAvg']
+            ), width=inpWidth
            )
        ], row=True)
 dyCompress = dbc.FormGroup([
@@ -209,7 +231,7 @@ dyCompress = dbc.FormGroup([
                         options=[
                             {'label':'Disable', 'value':'disable'},
                             {'label':'Enable', 'value':'enable'}
-                        ], value='enable', searchable=False, 
+                        ], value=defaultParams['dyCompress'], searchable=False, 
                            clearable=False, id='dyCompressRow'
                     ), width=dropWidth
                 )
