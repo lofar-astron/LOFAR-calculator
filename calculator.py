@@ -380,10 +380,7 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
               # User has specified a coordinate and it has passed validation
               # in the validate_inputs function.
               # Check if the number of SAPs is less than 488
-              if calibNames is None:
-                 nPoint = len(coord_list)
-              else:
-                 nPoint = len(coord_list) - len(calibNames)
+              nPoint = len(srcNameInput.split(','))
               nSAP = nPoint * int(nSB)
               maxSAP = 488
               if nSAP > maxSAP:
