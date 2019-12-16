@@ -211,7 +211,10 @@ def findTargetElevation(srcName, coord, obsDate):
       for item in xaxis:
          lofar.date = item
          target.compute(lofar)
-         yaxis.append( float(target.alt)*180./np.pi )
+         elevation = float(target.alt)*180./np.pi
+         if elevation < 0:
+            elevation = np.nan
+         yaxis.append(elevation)
       
       # Create a Plotly Scatter object that can be plotted later
       retData.append( Scatter(x=xaxis, y=yaxis, mode='lines', 
