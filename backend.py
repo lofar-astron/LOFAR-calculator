@@ -94,6 +94,9 @@ def calculate_proc_size(obsT, intTime, nBaselines, nChan, nSB, pipeType, tAvg,
       # Convert byte length to GB
       sbSize /= (1024*1024*1024)
       totSize = sbSize * nSB
+      # Reduce the data size if dysco is enabled.
+      if dyCompress == 'enable':
+         totSize = totSize/3.
       return '{:0.2f}'.format(totSize)
    else:
       pass
