@@ -316,6 +316,7 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
            # It is useful to have coord as a list from now on
            if coord is not '':
               coord_list = coord.split(',')
+              coord_input_list = coord.split(',')
 
            # Add calibrator names to the target list so that they can be 
            # plotted together. Before doing that, make a copy of the input 
@@ -351,7 +352,7 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
               # User has specified a coordinate and it has passed validation
               # in the validate_inputs function.
               # Check if the number of SAPs is less than 488
-              nPoint = len(coord_list)
+              nPoint = len(coord_input_list)
               nSAP = nPoint * int(nSB)
               maxSAP = 488
               if nSAP > maxSAP:
@@ -379,4 +380,4 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
 if __name__ == '__main__':
     #app.run_server(debug=True, host='0.0.0.0', port=8051)
     app.run_server(debug=False, host='0.0.0.0', port=8051, \
-                   dev_tools_ui=False, dev_tools_props_check=False)
+                  dev_tools_ui=False, dev_tools_props_check=False)
