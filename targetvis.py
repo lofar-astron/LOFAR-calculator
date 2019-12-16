@@ -145,7 +145,7 @@ def findBeamLayout(srcName, coord, nCore, nRemote, nInt, antenna_mode):
       data.append( 
         Scatter(x=[t_beam.ra.deg], 
                 y=[t_beam.dec.deg+tile_beam_size/2 + LABEL_OFFSET],
-                text=['Station beam'], 
+                text=['Tile beam'], 
                 mode='text'
         ) 
       )
