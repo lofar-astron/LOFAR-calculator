@@ -59,7 +59,7 @@ defaultParams = {'obsTime':'28800',
                  
                  'pipeType':'none', 
                  'tAvg':'1', 
-                 'fAvg':'1', 
+                 'fAvg':'4', 
                  'dyCompress':'enable',
                  
                  'targetName':'', 
