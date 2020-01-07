@@ -175,7 +175,7 @@ def resolve_source(names):
       retString = None
    return retString
 
-def findTargetElevation(srcName, coord, obsDate):
+def findTargetElevation(srcName, coord, obsDate, nInt):
    """For a given date and coordinate, find the elevation of the source every
       10 mins. Return both the datetime object array and the elevation array"""
    # Find the start and the end times
@@ -256,3 +256,74 @@ def findTargetElevation(srcName, coord, obsDate):
    retData.append( Scatter(x=xaxis, y=yaxis, mode='lines',
                            line={}, name='Jupiter') )
    return retData
+
+def addSunRiseAndSetTimes(obsDate, nInt, elevationFig):
+   """
+   For a given obsDate, find the sun rise and set times. Add these to the supplied 
+   elevationFig and return the modified elevationFig.
+   """
+   d = obsDate.split('-')
+   startTime = datetime(int(d[0]), int(d[1]), int(d[2]), 0, 0, 0)
+   sun = Sun()
+   sun._epoch = '2000'
+   if nInt == 0:
+      # Only Dutch array is being used. Calculate Sun rise and set times in NL
+      lofar = Observer()
+      lofar.lon = '6.869882'
+      lofar.lat = '52.915129'
+      lofar.elevation = 15.
+      lofar.date = startTime
+      sun_rise = lofar.next_rising(sun).datetime()
+      sun_set = lofar.next_setting(sun).datetime()
+      # Define a 1 hour window around Sun rise and Sun set.
+      sun_rise_beg = sun_rise - timedelta(minutes=30) 
+      sun_rise_end = sun_rise + timedelta(minutes=30)
+      sun_set_beg = sun_set - timedelta(minutes=30)
+      sun_set_end = sun_set + timedelta(minutes=30)
+   else:
+      # Calculate sun rise and set times using Latvian and Irish stations
+      lv = Observer()
+      lv.lon = '21.854916'
+      lv.lat = '57.553493'
+      lv.date = startTime
+      ie = Observer()
+      ie.lon = '-7.921790'
+      ie.lat = '53.094967'
+      ie.date = startTime
+      lv_sun_rise = lv.next_rising(sun).datetime()
+      lv_sun_set = lv.next_setting(sun).datetime()
+      ie_sun_rise = ie.next_rising(sun).datetime()
+      ie_sun_set = ie.next_setting(sun).datetime()
+      print(lv_sun_set)
+      print(lv.next_setting(sun))
+      # Define a window around sun rise and sun set.
+      sun_rise_beg = lv_sun_rise - timedelta(minutes=30)
+      sun_rise_end = ie_sun_rise + timedelta(minutes=30)
+      sun_set_beg = lv_sun_set - timedelta(minutes=30)
+      sun_set_end = ie_sun_set + timedelta(minutes=30)
+   # Add to elevationFig
+   elevationFig['layout']['shapes'].append({
+      'type': "rect",
+      'xref': 'x',
+      'yref': 'y',
+      'x0'  : sun_rise_beg,
+      'x1'  : sun_rise_end,
+      'y0'  : 0,
+      'y1'  : 90,
+      'fillcolor': 'LightSkyBlue',
+      'opacity': 0.4,
+      'line': {'width': 0,}
+   })
+   elevationFig['layout']['shapes'].append({
+      'type': "rect",
+      'xref': 'x',
+      'yref': 'y',
+      'x0'  : sun_set_beg,
+      'x1'  : sun_set_end,
+      'y0'  : 0,
+      'y1'  : 90,
+      'fillcolor': 'LightSkyBlue',
+      'opacity': 0.4,
+      'line': {'width': 0,}
+   })      
+   return elevationFig

@@ -361,15 +361,17 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
                  return '', '', '', '', msg, True, \
                   {'display':'none'}, {}, {'display':'none'}, {}
               # Find target elevation across a 24-hour period
-              data = tv.findTargetElevation(srcName, coord_list, obsDate)
+              data = tv.findTargetElevation(srcName, coord_list, obsDate, int(nInt))
               displayFig = {'display':'block', 'height':600}
               elevationFig = {'data':data,
-                              'layout':go.Layout(
-                                       xaxis={'title':'Time (UTC)'},
-                                       yaxis={'title':'Elevation'},
-                                       title='Target visibility plot'
-                                       )
+                              'layout':{
+                                       'xaxis':{'title':'Time (UTC)'},
+                                       'yaxis':{'title':'Elevation'},
+                                       'title':'Target visibility plot',
+                                       'shapes':[]
+                                       }
                              }
+              elevationFig = tv.addSunRiseAndSetTimes(obsDate, int(nInt), elevationFig)
               # Find the position of the station and tile beam 
               beamFig = tv.findBeamLayout(srcNameInput, coordInput, \
                                    int(nCore), int(nRemote), int(nInt), hbaMode)
