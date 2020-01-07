@@ -111,7 +111,7 @@ def validate_inputs(obsT, nCore, nRemote, nInt, nSB, integT, tAvg,
          - nInt is not None
          - nCore+nRemote+nInt is at least 1
          - nSB is an integer and is at least 1 or greater
-         - integT is a valid positive number
+         - integT is a valid positive number greater than or equal to 0.16
          - tAvg is an integer
          - fAvg is an integer
          - srcName is a string
@@ -148,8 +148,8 @@ def validate_inputs(obsT, nCore, nRemote, nInt, nSB, integT, tAvg,
    # Validate integration time
    try:
       float(integT)
-      if float(integT) <= 0.:
-         msg += 'Invalid integration time specified.\n'
+      if float(integT) < 0.16:
+         msg += 'Invalid integration time specified. Must be >= 0.16\n'
    except:
       msg += 'Invalid integration time specified.\n'
    # Validate time averaging factor
