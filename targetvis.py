@@ -4,6 +4,7 @@ from astropy.coordinates import SkyCoord
 from astropy import units as u
 from ephem import Observer, FixedBody, Sun, Moon, Jupiter
 import numpy as np      
+import csv
 from plotly.graph_objs import Scatter, Layout
 
 # Define coordinates of calibrators
@@ -158,6 +159,18 @@ def findBeamLayout(srcName, coord, nCore, nRemote, nInt, antenna_mode):
    layout['yaxis']['range'] = [ymin-bufsize,ymax+bufsize]
    return {'layout': layout, 'data':data}
 
+def resolve_lotss_source(name):
+   """Check if a given source name is a LoTSS pointing? If it is, return its 
+      coordinates in (hourangle, deg) units. Else, return None."""
+   coord = None
+   with open('lotss_pointings.txt', newline='\n') as f:
+      text = f.readlines()
+      for line in text:
+         if name == line.split()[0]:
+            coord = {'RA':[line.split()[3]], 'DEC':[line.split()[4]]}
+            break
+   return coord
+
 def resolve_source(names):
    """For a given source name, use astroquery to find its coordinates.
       The source name can be a single source or a comma separated list."""
@@ -165,6 +178,9 @@ def resolve_source(names):
    try:
       for name in names.split(','):
          query = Simbad.query_object(name)
+         if query is None:
+            # Source is not a valid Simbad object. Is it a LoTSS pointing?
+            query = resolve_lotss_source(name)
          ra = query['RA'][0]
          dec= query['DEC'][0]
          coord = SkyCoord('{} {}'.format(ra, dec), unit=(u.hourangle, u.deg))
@@ -232,6 +248,7 @@ def findTargetElevation(srcName, coord, obsDate, nInt):
       yaxis.append(elevation)
    retData.append( Scatter(x=xaxis, y=yaxis, mode='lines',
                            line={}, name='Sun') )
+
    moon = Moon()
    yaxis = []
    for item in xaxis:
@@ -243,7 +260,7 @@ def findTargetElevation(srcName, coord, obsDate, nInt):
       yaxis.append(elevation)
    retData.append( Scatter(x=xaxis, y=yaxis, mode='lines',
                            line={}, name='Moon') )
-   
+
    jupiter = Jupiter()
    yaxis = []
    for item in xaxis:
