@@ -367,7 +367,8 @@ resultGUIFrame = html.Div(children=[
 ###############################################################################
 # Layout of the graph
 ###############################################################################
-graph = dbc.Row([
+graph = html.Div([
+        dbc.Row([
            dbc.Col(
               html.Div([ 
                  dcc.Graph(id='elevation-plot', 
@@ -391,6 +392,14 @@ graph = dbc.Row([
                  )
               ]), width=5
            )
+        ]),
+        dbc.Row([
+           dbc.Col(
+              html.Div([
+                 dcc.Graph(id='distance-table')
+              ]), width=7
+           )
+        ])
         ])
 
 ###############################################################################

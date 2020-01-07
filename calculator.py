@@ -246,7 +246,9 @@ def serve_static(resource):
        Output('elevation-plot', 'style'),
        Output('elevation-plot', 'figure'),
        Output('beam-plot', 'style'),
-       Output('beam-plot', 'figure')
+       Output('beam-plot', 'figure'),
+       Output('distance-table', 'style'),
+       Output('distance-table', 'figure')
     ],
     [  Input('calculate','n_clicks'), 
        Input('msgBoxClose', 'n_clicks'),
@@ -278,12 +280,12 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
     if is_open is True:
        # User has closed the error message box
        return '', '', '', '', '', False, \
-              {'display':'none'}, {}, {'display':'none'}, {}
+              {'display':'none'}, {}, {'display':'none'}, {}, {'display':'none'}, {}
     if n is None:
         # Calculate button has not been clicked yet
         # So, do nothing and set default values to results field
         return '', '', '', '', '', False, \
-               {'display':'none'}, {}, {'display':'none'}, {}
+               {'display':'none'}, {}, {'display':'none'}, {}, {'display':'none'}, {}
     else:
         # Calculate button has been clicked.
         # First, validate all command line inputs
@@ -299,7 +301,7 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
                                          srcName, coord, hbaMode)
         if status is False:
            return '', '', '', '', msg, True, \
-                  {'display':'none'}, {}, {'display':'none'}, {}
+                  {'display':'none'}, {}, {'display':'none'}, {}, {'display':'none'}, {}
         else:
            # Estimate the raw data size
            nBaselines = bk.compute_baselines(int(nCore), int(nRemote), 
@@ -348,6 +350,8 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
               displayFig = {'display':'none'}
               elevationFig = {}
               beamFig = {}
+              displayTab = {'display':'none'}
+              distanceTab = {}
            else:
               # User has specified a coordinate and it has passed validation
               # in the validate_inputs function.
@@ -359,7 +363,7 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
                  msg = 'Number of targets times number of subbands cannot ' + \
                        'be greater than {}.'.format(maxSAP)
                  return '', '', '', '', msg, True, \
-                  {'display':'none'}, {}, {'display':'none'}, {}
+                  {'display':'none'}, {}, {'display':'none'}, {}, {'display':'none'}, {}
               # Find target elevation across a 24-hour period
               data = tv.findTargetElevation(srcName, coord_list, obsDate, int(nInt))
               displayFig = {'display':'block', 'height':600}
@@ -375,9 +379,18 @@ def on_calculate_click(n, n_clicks, obsT, nCore, nRemote, nInt, nChan, nSB,
               # Find the position of the station and tile beam 
               beamFig = tv.findBeamLayout(srcNameInput, coordInput, \
                                    int(nCore), int(nRemote), int(nInt), hbaMode)
+              # Calculate the distance between all the targets and offending sources
+              displayTab = {'display':'block'}
+              table_data = [tv.makeDistanceTable(srcNameInput, coordInput, obsDate)]
+              table_title= 'Angular distances in degrees between specified targets' +\
+                           ' and other bright sources'
+              distanceTab = {'data':table_data,
+                             'layout':{'title':table_title, 'autosize':True}
+                            }
 
            return imNoise, rawSize, avgSize, 0, '', \
-                  False, displayFig, elevationFig, displayFig, beamFig
+                  False, displayFig, elevationFig, displayFig, beamFig, \
+                  displayTab, distanceTab
 
 if __name__ == '__main__':
     #app.run_server(debug=True, host='0.0.0.0', port=8051)

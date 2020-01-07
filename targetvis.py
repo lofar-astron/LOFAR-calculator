@@ -6,6 +6,7 @@ from ephem import Observer, FixedBody, Sun, Moon, Jupiter
 import numpy as np      
 import csv
 from plotly.graph_objs import Scatter, Layout
+from plotly.graph_objects import Table
 
 # Define coordinates of calibrators
 calib_coordinates = {
@@ -206,7 +207,6 @@ def findTargetElevation(srcName, coord, obsDate, nInt):
       tempTime += timedelta(minutes=5)
    
    # Create the telescope object
-   # LOFAR coordinates were taken from Aleksandar's code
    lofar = Observer()
    lofar.lon = '6.869882'
    lofar.lat = '52.915129'
@@ -311,8 +311,6 @@ def addSunRiseAndSetTimes(obsDate, nInt, elevationFig):
       lv_sun_set = lv.next_setting(sun).datetime()
       ie_sun_rise = ie.next_rising(sun).datetime()
       ie_sun_set = ie.next_setting(sun).datetime()
-      print(lv_sun_set)
-      print(lv.next_setting(sun))
       # Define a window around sun rise and sun set.
       sun_rise_beg = lv_sun_rise - timedelta(minutes=30)
       sun_rise_end = ie_sun_rise + timedelta(minutes=30)
@@ -344,3 +342,114 @@ def addSunRiseAndSetTimes(obsDate, nInt, elevationFig):
       'line': {'width': 0,}
    })      
    return elevationFig
+
+def getDistanceToSun(target, obsDate):
+   """Compute the distance between the Sun and the target on the specified date."""
+   d = obsDate.split('-')
+   startTime = datetime(int(d[0]), int(d[1]), int(d[2]), 0, 0, 0)
+   endTime = startTime + timedelta(hours=24)
+   # Get a list of values along the time axis
+   taxis = []
+   tempTime = startTime
+   while(tempTime < endTime):
+      taxis.append(tempTime)
+      tempTime += timedelta(hours=1)
+   angsep = []
+   sun = Sun()
+   for time in taxis:
+      sun.compute(time)
+      s_coord = SkyCoord('{} {}'.format(sun.ra, sun.dec), unit=(u.hourangle, u.deg))
+      angsep.append(s_coord.separation(target).deg)
+   return np.mean(angsep)
+
+def getDistanceToMoon(target, obsDate):
+   """Compute the distance between the Moon and the target on the specified date."""
+   d = obsDate.split('-')
+   startTime = datetime(int(d[0]), int(d[1]), int(d[2]), 0, 0, 0)
+   endTime = startTime + timedelta(hours=24)
+   # Get a list of values along the time axis
+   taxis = []
+   tempTime = startTime
+   while(tempTime < endTime):
+      taxis.append(tempTime)
+      tempTime += timedelta(hours=1)
+   angsep = []
+   moon = Moon()
+   for time in taxis:
+      moon.compute(time)
+      m_coord = SkyCoord('{} {}'.format(moon.ra, moon.dec), unit=(u.hourangle, u.deg))
+      angsep.append(m_coord.separation(target).deg)
+   return np.min(angsep), np.max(angsep)
+
+def getDistanceToJupiter(target, obsDate):
+   """Compute the distance between Jupiter and the target on the specified date."""
+   d = obsDate.split('-')
+   startTime = datetime(int(d[0]), int(d[1]), int(d[2]), 0, 0, 0)
+   endTime = startTime + timedelta(hours=24)
+   # Get a list of values along the time axis
+   taxis = []
+   tempTime = startTime
+   while(tempTime < endTime):
+      taxis.append(tempTime)
+      tempTime += timedelta(hours=1)
+   angsep = []
+   jup = Jupiter()
+   for time in taxis:
+      jup.compute(time)
+      j_coord = SkyCoord('{} {}'.format(jup.ra, jup.dec), unit=(u.hourangle, u.deg))
+      angsep.append(j_coord.separation(target).deg)
+   return np.mean(angsep)
+
+def makeDistanceTable(srcNameInput, coordInput, obsDate):
+   """Generate a plotly Table showing the distances between user-specified 
+      targets and a few offending sources"""
+   srcNameList = srcNameInput.split(',')
+   coordList = coordInput.split(',')
+   col_names = ['Sources']+srcNameList
+   header = {
+      'values': col_names,
+      'font'  : {'size':12, 'color':'white'},
+      'align' : 'left',
+      'fill_color': 'grey',
+      'line_color': 'darkslategray'
+   }
+   col_values = [['CasA', 'CygA', 'TauA', 'VirA', 'Sun', 'Moon(min,max)', 'Jupiter']]
+   
+   # Iterate through each source and compute the distances
+   for idx, target in enumerate(srcNameList):
+      # Get the coordinate of this target
+      t_coord = SkyCoord(coordList[idx])
+      # CasA
+      s_coord = SkyCoord(ateam_coordinates['CasA'])
+      d_casa = s_coord.separation(t_coord).deg
+      # CygA
+      s_coord = SkyCoord(ateam_coordinates['CygA'])
+      d_cyga = s_coord.separation(t_coord).deg
+      # TauA
+      s_coord = SkyCoord(ateam_coordinates['TauA'])
+      d_taua = s_coord.separation(t_coord).deg
+      # VirA
+      s_coord = SkyCoord(ateam_coordinates['VirA'])
+      d_vira = s_coord.separation(t_coord).deg
+      # Sun
+      d_sun = getDistanceToSun(t_coord, obsDate)
+      # Moon
+      d_moon_min, d_moon_max = getDistanceToMoon(t_coord, obsDate)
+      # Jupiter
+      d_jupiter = getDistanceToJupiter(t_coord, obsDate)
+      # Consolidate all into a list
+      this_row = ['{:0.2f}'.format(d_casa), 
+                  '{:0.2f}'.format(d_cyga), 
+                  '{:0.2f}'.format(d_taua), 
+                  '{:0.2f}'.format(d_vira), 
+                  '{:0.2f}'.format(d_sun), 
+                  '{:0.2f},{:0.2f}'.format(d_moon_min, d_moon_max),
+                  '{:0.2f}'.format(d_jupiter)]
+      # Add this row to the col_values table
+      col_values.append(this_row)
+   
+   tab = Table(
+            header=header,
+            cells=dict(values=col_values, align='left')
+         )
+   return tab
