@@ -343,62 +343,44 @@ def addSunRiseAndSetTimes(obsDate, nInt, elevationFig):
    })      
    return elevationFig
 
-def getDistanceToSun(target, obsDate):
-   """Compute the distance between the Sun and the target on the specified date."""
+def getDistanceSolar(target, obsDate, offender):
+   """Compute the angular distance in degrees between the specified target and 
+      the offending radio source in the solar system on the specified observing date. 
+      Input parameters:
+      * target   - Coordinate of the target as an Astropy SkyCoord object
+      * obsDate  - Observing date in datetime.datetime format
+      * offender - Name of the offending bright source. Allowed values are
+                   Sun, Moon, Jupiter.
+      Returns:
+      For Moon, the minimum and maximum separation are returned. For others, 
+      distance,None is returned."""
+   # Get a list of values along the time axis
    d = obsDate.split('-')
    startTime = datetime(int(d[0]), int(d[1]), int(d[2]), 0, 0, 0)
    endTime = startTime + timedelta(hours=24)
-   # Get a list of values along the time axis
    taxis = []
    tempTime = startTime
    while(tempTime < endTime):
       taxis.append(tempTime)
       tempTime += timedelta(hours=1)
    angsep = []
-   sun = Sun()
+   if offender == 'Sun':
+      obj = Sun()
+   elif offender == 'Moon':
+      obj = Moon()
+   elif offender == 'Jupiter':
+      obj = Jupiter()
+   else: pass
+   # Estimate the angular distance over the entire time axis
    for time in taxis:
-      sun.compute(time)
-      s_coord = SkyCoord('{} {}'.format(sun.ra, sun.dec), unit=(u.hourangle, u.deg))
-      angsep.append(s_coord.separation(target).deg)
-   return np.mean(angsep)
-
-def getDistanceToMoon(target, obsDate):
-   """Compute the distance between the Moon and the target on the specified date."""
-   d = obsDate.split('-')
-   startTime = datetime(int(d[0]), int(d[1]), int(d[2]), 0, 0, 0)
-   endTime = startTime + timedelta(hours=24)
-   # Get a list of values along the time axis
-   taxis = []
-   tempTime = startTime
-   while(tempTime < endTime):
-      taxis.append(tempTime)
-      tempTime += timedelta(hours=1)
-   angsep = []
-   moon = Moon()
-   for time in taxis:
-      moon.compute(time)
-      m_coord = SkyCoord('{} {}'.format(moon.ra, moon.dec), unit=(u.hourangle, u.deg))
-      angsep.append(m_coord.separation(target).deg)
-   return np.min(angsep), np.max(angsep)
-
-def getDistanceToJupiter(target, obsDate):
-   """Compute the distance between Jupiter and the target on the specified date."""
-   d = obsDate.split('-')
-   startTime = datetime(int(d[0]), int(d[1]), int(d[2]), 0, 0, 0)
-   endTime = startTime + timedelta(hours=24)
-   # Get a list of values along the time axis
-   taxis = []
-   tempTime = startTime
-   while(tempTime < endTime):
-      taxis.append(tempTime)
-      tempTime += timedelta(hours=1)
-   angsep = []
-   jup = Jupiter()
-   for time in taxis:
-      jup.compute(time)
-      j_coord = SkyCoord('{} {}'.format(jup.ra, jup.dec), unit=(u.hourangle, u.deg))
-      angsep.append(j_coord.separation(target).deg)
-   return np.mean(angsep)
+      obj.compute(time)
+      coord = SkyCoord('{} {}'.format(obj.ra, obj.dec), unit=(u.hourangle, u.deg))
+      angsep.append(coord.separation(target).deg)
+   # Return appropriate result
+   if offender == 'Moon':
+      return np.min(angsep), np.max(angsep)
+   else:
+      return np.mean(angsep), None
 
 def makeDistanceTable(srcNameInput, coordInput, obsDate):
    """Generate a plotly Table showing the distances between user-specified 
@@ -432,11 +414,11 @@ def makeDistanceTable(srcNameInput, coordInput, obsDate):
       s_coord = SkyCoord(ateam_coordinates['VirA'])
       d_vira = s_coord.separation(t_coord).deg
       # Sun
-      d_sun = getDistanceToSun(t_coord, obsDate)
+      d_sun, _ = getDistanceSolar(t_coord, obsDate, 'Sun')
       # Moon
-      d_moon_min, d_moon_max = getDistanceToMoon(t_coord, obsDate)
+      d_moon_min, d_moon_max = getDistanceSolar(t_coord, obsDate, 'Moon')
       # Jupiter
-      d_jupiter = getDistanceToJupiter(t_coord, obsDate)
+      d_jupiter, _ = getDistanceSolar(t_coord, obsDate, 'Jupiter')
       # Consolidate all into a list
       this_row = ['{:0.2f}'.format(d_casa), 
                   '{:0.2f}'.format(d_cyga), 
