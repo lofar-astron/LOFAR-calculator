@@ -42,7 +42,7 @@ def makePdfPlot(elevation_fig, outfilename):
 
 def generatepdf(pdffile, obsT, nCore, nRemote, nInt, nChan, nSb, integT, 
                 antSet, pipeType, tAvg, fAvg, isDysco, imNoiseVal, rawSize, 
-                procSize, pipeTime, elevation_fig, isMsgBoxOpen):
+                procSize, pipeTime, elevation_fig, distance_table, isMsgBoxOpen):
    """Function to generate a pdf file summarizing the content of the calculator.
        Return nothing."""   
    # Create an A4 sheet
@@ -103,8 +103,31 @@ def generatepdf(pdffile, obsT, nCore, nRemote, nInt, nChan, nSb, integT,
       string += '<center>'
       string += '<img src={} width=400 height=250>'.format(pngfilename)
       string += '</center>'
-      
    
+   # Add the distance table to the PDF
+   if distance_table != {}:
+      title = distance_table['layout']['title']
+      string += '<center><b>{}</b></center>'.format(title)
+      string += '<table border="0" align="left" width="80%">'
+      col_titles = distance_table['data'][0]['header']['values']
+      col_width = 100//len(col_titles)
+      string += '<thead><tr>'
+      for item in col_titles:
+         string += '<th width="{}%" align="left">'.format(col_width) + item + '</th>'
+      string += '</tr></thead>'
+      string += '<tbody>'
+      row_titles = distance_table['data'][0]['cells']['values'][0]
+      tab_data   = distance_table['data'][0]['cells']['values']
+      # Transpose tab_data and write cells to the table
+      tab_data = list(map(list, zip(*tab_data)))
+      for row in tab_data:
+         string += '<tr>'
+         for item in row:
+            string += '<td>{}</td>'.format(item)
+         string += '</tr>'
+      string += '</tbody>'
+      string += '</table>'
+
    # Write text to the pdf file
    pdf.write_html(string)
    
