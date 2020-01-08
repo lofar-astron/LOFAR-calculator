@@ -29,6 +29,29 @@ tile_beam_size = 20
 
 # TODO: FWHM of LBA dipole beam in deg
 
+def getDutchLofarObject():
+   """Return an ephem.Observer() object with details containing the Dutch 
+      Lofar array"""
+   lofar = Observer()
+   lofar.lon = '6.869882'
+   lofar.lat = '52.915129'
+   lofar.elevation = 15.
+   return lofar
+
+def getLVLofarObject():
+   """Return an ephem.Observer() object with details containing the LV station"""
+   lv = Observer()
+   lv.lon = '21.854916'
+   lv.lat = '57.553493'
+   return lv
+
+def getIELofarObject():
+   """Return an ephem.Observer() object with details containing the IE station"""
+   ie = Observer()
+   ie.lon = '-7.921790'
+   ie.lat = '53.094967'
+   return ie
+
 def getStationBeamSize(nCore, nRemote, nInt, antenna_mode):
    """Return FWHM of station beam for a given antenna list and array mode"""
    # FWHM of station beams in deg
@@ -203,11 +226,7 @@ def getElevationSolar(obsDate, offender):
       List of elevations in degrees. If offender is invalid, return None.
    """
    # Create the telescope object
-   lofar = Observer()
-   lofar.lon = '6.869882'
-   lofar.lat = '52.915129'
-   lofar.elevation = 15.
-
+   lofar = getDutchLofarObject()
    if offender == 'Sun':
       obj = Sun()
    elif offender == 'Moon':
@@ -228,6 +247,48 @@ def getElevationSolar(obsDate, offender):
    
    return yaxis
 
+def getElevationTarget(target, obsDate, nInt):
+   """For a given target and list of times, return a list of its elevation. 
+      If nInt is 0, compute elevation with respect to the NL array. If nInt>0, 
+      elevation needs to take into account the entire European array.
+      Input Parameters:
+      * target: An ephem.FixedBody() object
+      * obsDate: List of datetime.datetime objects
+      * nInt: Number of international stations to use in the observation.   
+   """
+   lofar = getDutchLofarObject()
+   yaxis = []
+   if nInt == 0:
+      # We are observing with the Dutch array
+      for time in obsDate:
+         lofar.date = time
+         target.compute(lofar)
+         elevation = float(target.alt)*180./np.pi
+         if elevation < 0:
+            elevation = np.nan
+         yaxis.append(elevation)
+   else:
+      # We are observing with the entire ILT array
+      # In addition to lofar, we also need IE and LV Observer() objects
+      lv = getLVLofarObject()
+      ie = getIELofarObject()
+      elevation = [0,0,0]
+      for time in obsDate:
+         lofar.date = time
+         lv.date = time
+         ie.date = time
+         target.compute(lofar)
+         elevation[0] = float(target.alt)*180./np.pi
+         target.compute(lv)
+         elevation[1] = float(target.alt)*180./np.pi
+         target.compute(ie)
+         elevation[2] = float(target.alt)*180./np.pi
+         if np.min(elevation) < 0:
+            yaxis.append(np.nan)
+         else:
+            yaxis.append(np.min(elevation))
+   return yaxis
+
 def findTargetElevation(srcName, coord, obsDate, nInt):
    """For a given date and coordinate, find the elevation of the source every
       10 mins. Return both the datetime object array and the elevation array"""
@@ -242,12 +303,6 @@ def findTargetElevation(srcName, coord, obsDate, nInt):
       xaxis.append(tempTime)
       tempTime += timedelta(minutes=5)
    
-   # Create the telescope object
-   lofar = Observer()
-   lofar.lon = '6.869882'
-   lofar.lat = '52.915129'
-   lofar.elevation = 15.
-   
    # Create a target object
    retData = []
    srcNameList = srcName.split(',')
@@ -259,18 +314,11 @@ def findTargetElevation(srcName, coord, obsDate, nInt):
       target._dec= coord_target.dec.radian
    
       # Iterate over each time interval and estimate the elevation of the target
-      yaxis = []
-      for item in xaxis:
-         lofar.date = item
-         target.compute(lofar)
-         elevation = float(target.alt)*180./np.pi
-         if elevation < 0:
-            elevation = np.nan
-         yaxis.append(elevation)
-      
+      yaxis = getElevationTarget(target, xaxis, nInt)      
       # Create a Plotly Scatter object that can be plotted later
       retData.append( Scatter(x=xaxis, y=yaxis, mode='lines', 
                                line={}, name=srcNameList[i] ) )
+
    # We should also plot Sun, Moon, and Jupiter by default
    yaxis = getElevationSolar(xaxis, 'Sun')
    retData.append( Scatter(x=xaxis, y=yaxis, mode='lines',
@@ -294,10 +342,7 @@ def addSunRiseAndSetTimes(obsDate, nInt, elevationFig):
    sun._epoch = '2000'
    if nInt == 0:
       # Only Dutch array is being used. Calculate Sun rise and set times in NL
-      lofar = Observer()
-      lofar.lon = '6.869882'
-      lofar.lat = '52.915129'
-      lofar.elevation = 15.
+      lofar = getDutchLofarObject()
       lofar.date = startTime
       sun_rise = lofar.next_rising(sun).datetime()
       sun_set = lofar.next_setting(sun).datetime()
@@ -308,13 +353,9 @@ def addSunRiseAndSetTimes(obsDate, nInt, elevationFig):
       sun_set_end = sun_set + timedelta(minutes=30)
    else:
       # Calculate sun rise and set times using Latvian and Irish stations
-      lv = Observer()
-      lv.lon = '21.854916'
-      lv.lat = '57.553493'
+      lv = getLVLofarObject()
+      ie = getIELofarObject()
       lv.date = startTime
-      ie = Observer()
-      ie.lon = '-7.921790'
-      ie.lat = '53.094967'
       ie.date = startTime
       lv_sun_rise = lv.next_rising(sun).datetime()
       lv_sun_set = lv.next_setting(sun).datetime()
