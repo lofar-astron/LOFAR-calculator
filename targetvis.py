@@ -192,6 +192,42 @@ def resolve_source(names):
       retString = None
    return retString
 
+def getElevationSolar(obsDate, offender):
+   """For a given observation date and bright solar system object, return its 
+      elevation over the course of that day.
+      Input parameters:
+      * obsDate: Observation date in datetime.datetime format
+      * offender: Name of the solar system object. Allowed names are 
+                  Sun, Moon, and Jupiter.
+      Returns:
+      List of elevations in degrees. If offender is invalid, return None.
+   """
+   # Create the telescope object
+   lofar = Observer()
+   lofar.lon = '6.869882'
+   lofar.lat = '52.915129'
+   lofar.elevation = 15.
+
+   if offender == 'Sun':
+      obj = Sun()
+   elif offender == 'Moon':
+      obj = Moon()
+   elif offender == 'Jupiter':
+      obj = Jupiter()
+   else:
+      return None
+
+   yaxis = []
+   for time in obsDate:
+      lofar.date = time
+      obj.compute(lofar)
+      elevation = float(obj.alt)*180./np.pi
+      if elevation < 0:
+         elevation = np.nan
+      yaxis.append(elevation)
+   
+   return yaxis
+
 def findTargetElevation(srcName, coord, obsDate, nInt):
    """For a given date and coordinate, find the elevation of the source every
       10 mins. Return both the datetime object array and the elevation array"""
@@ -236,40 +272,13 @@ def findTargetElevation(srcName, coord, obsDate, nInt):
       retData.append( Scatter(x=xaxis, y=yaxis, mode='lines', 
                                line={}, name=srcNameList[i] ) )
    # We should also plot Sun, Moon, and Jupiter by default
-   sun = Sun()
-   sun._epoch = '2000'
-   yaxis = []
-   for item in xaxis:
-      lofar.date = item
-      sun.compute(lofar)
-      elevation = float(sun.alt)*180./np.pi
-      if elevation < 0:
-         elevation = np.nan
-      yaxis.append(elevation)
+   yaxis = getElevationSolar(xaxis, 'Sun')
    retData.append( Scatter(x=xaxis, y=yaxis, mode='lines',
                            line={}, name='Sun') )
-
-   moon = Moon()
-   yaxis = []
-   for item in xaxis:
-      lofar.date = item
-      moon.compute(lofar)
-      elevation = float(moon.alt)*180./np.pi
-      if elevation < 0:
-         elevation = np.nan
-      yaxis.append(elevation)
+   yaxis = getElevationSolar(xaxis, 'Moon')
    retData.append( Scatter(x=xaxis, y=yaxis, mode='lines',
                            line={}, name='Moon') )
-
-   jupiter = Jupiter()
-   yaxis = []
-   for item in xaxis:
-      lofar.date = item
-      jupiter.compute(lofar)
-      elevation = float(jupiter.alt)*180./np.pi
-      if elevation < 0:
-         elevation = np.nan
-      yaxis.append(elevation)
+   yaxis = getElevationSolar(xaxis, 'Jupiter')
    retData.append( Scatter(x=xaxis, y=yaxis, mode='lines',
                            line={}, name='Jupiter') )
    return retData
