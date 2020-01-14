@@ -6,8 +6,6 @@ from fpdf import FPDF, HTMLMixin
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
-from pandas.plotting import register_matplotlib_converters
-register_matplotlib_converters()
 
 # Dummy class needed to generate the PDF file
 class MyFPDF(FPDF, HTMLMixin):
