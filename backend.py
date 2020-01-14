@@ -102,6 +102,34 @@ def calculate_proc_size(obs_t, int_time, n_baselines, n_chan, n_sb, pipe_type,
             tot_size = tot_size/3.
         return '{:0.2f}'.format(tot_size)
 
+def calculate_pipe_time(obs_t, n_sb, array_mode, ateam_names, pipe_type):
+    """Compute the pipeline processing time.
+       Inputs:
+           obs_t - Observation time in hours
+           n_sb  - Number of subbands
+           ateam_names - List of A-team sources to demix
+           pipe_type - Name of the pipeline
+       Returns pipeline processing time in hours"""
+    proc_time = 0
+    # Figure out the number of ateam sources specified
+    if ateam_names is None:
+        n_ateams = 0
+    else:
+        n_ateams = len(ateam_names)
+
+    # Hard-coded P/O factors for 1 SB. Empirically determined.
+    hba_factor = {0:0.002, 1:0.0025, 2:0.005}
+    lba_factor = {0:0.004, 1:0.004, 2:0.014}
+
+    if pipe_type == 'preprocessing':
+        if 'hba' in array_mode:
+            proc_time = hba_factor[n_ateams] * n_sb * obs_t
+        else:
+            proc_time = lba_factor[n_ateams] * n_sb * obs_t
+    # Convert to hours
+    proc_time /= 3600.
+    return proc_time
+
 def validate_inputs(obs_t, n_core, n_remote, n_int, n_sb, integ_t, t_avg,
                     f_avg, src_name, coord, hba_mode, pipe_type, ateam_names):
     """Valid text input supplied by the user: observation time, number of
@@ -166,7 +194,7 @@ def validate_inputs(obs_t, n_core, n_remote, n_int, n_sb, integ_t, t_avg,
         msg += 'Invalid frequency averaging factor specified.'
     # Validate the number of A-team sources if a pipeline is specified
     # Figure out the number of ateam sources specified
-    if ateam_names == None:
+    if ateam_names is None:
         n_ateams = 0
     else:
         n_ateams = len(ateam_names)

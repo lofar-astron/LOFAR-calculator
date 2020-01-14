@@ -191,7 +191,7 @@ def on_resolve_click(n, close_msg_box, target_name, is_open):
 
      State('elevation-plot', 'figure'),
      State('distance-table', 'figure'),
-     
+
      State('dateRow', 'date')
     ]
 )
@@ -319,7 +319,13 @@ def on_calculate_click(n, n_clicks, obs_t, n_core, n_remote, n_int, n_chan, n_sb
                                               n_baselines, int(n_chan), int(n_sb),
                                               pipe_type, int(t_avg), int(f_avg),
                                               dy_compress)
-            # TODO Calculate the processing time
+            if pipe_type == 'none':
+                # No pipeline
+                pipe_time = None
+            else:
+                pipe_time = bk.calculate_pipe_time(float(obs_t), int(n_sb),
+                                                   hba_mode, ateam_names,
+                                                   pipe_type)
 
             # It is useful to have coord as a list from now on
             if coord is not '':
@@ -399,11 +405,11 @@ def on_calculate_click(n, n_clicks, obs_t, n_core, n_remote, n_int, n_chan, n_sb
                                 'layout':{'title':table_title, 'autosize':True}
                                }
 
-            return im_noise, raw_size, avg_size, 0, '', \
+            return im_noise, raw_size, avg_size, pipe_time, '', \
                    False, display_fig, elevation_fig, display_fig, beam_fig, \
                    display_tab, distance_tab
 
 if __name__ == '__main__':
-    app.run_server(debug=True, host='0.0.0.0', port=8051)
-    #app.run_server(debug=False, host='0.0.0.0', port=8051, \
-    #              dev_tools_ui=False, dev_tools_props_check=False)
+    #app.run_server(debug=True, host='0.0.0.0', port=8051)
+    app.run_server(debug=False, host='0.0.0.0', port=8051, \
+                  dev_tools_ui=False, dev_tools_props_check=False)
