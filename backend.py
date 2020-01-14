@@ -103,7 +103,7 @@ def calculate_proc_size(obs_t, int_time, n_baselines, n_chan, n_sb, pipe_type,
         return '{:0.2f}'.format(tot_size)
 
 def validate_inputs(obs_t, n_core, n_remote, n_int, n_sb, integ_t, t_avg,
-                    f_avg, src_name, coord, hba_mode):
+                    f_avg, src_name, coord, hba_mode, pipe_type, ateam_names):
     """Valid text input supplied by the user: observation time, number of
        subbands, and integration time. Following checks will be performed:
          - obs_time is a valid positive number
@@ -118,6 +118,7 @@ def validate_inputs(obs_t, n_core, n_remote, n_int, n_sb, integ_t, t_avg,
          - src_name is a string
          - coord is a valid AstroPy coordinate
          - While observing with HBA, check if the targets are inside the tile beam.
+         - ateam_names <= 2 if pipe_type is not "None"
        Return state=True/False accompanied by an error msg
        Note: all input parameters are still strings."""
     msg = ''
@@ -163,6 +164,14 @@ def validate_inputs(obs_t, n_core, n_remote, n_int, n_sb, integ_t, t_avg,
         int(str(f_avg))
     except ValueError:
         msg += 'Invalid frequency averaging factor specified.'
+    # Validate the number of A-team sources if a pipeline is specified
+    # Figure out the number of ateam sources specified
+    if ateam_names == None:
+        n_ateams = 0
+    else:
+        n_ateams = len(ateam_names)
+    if pipe_type != 'none' and n_ateams > 2:
+        msg += 'Cannot demix more than two A-team sources.'
     # Validate the coordinates specified under target setup
     if coord is not '':
         # Warn if the number of targets do not match the number of coordinates

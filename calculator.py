@@ -300,7 +300,8 @@ def on_calculate_click(n, n_clicks, obs_t, n_core, n_remote, n_int, n_chan, n_sb
             n_int = '0'
         status, msg = bk.validate_inputs(obs_t, int(n_core), int(n_remote), \
                                          int(n_int), n_sb, integ_t, t_avg, f_avg, \
-                                         src_name, coord, hba_mode)
+                                         src_name, coord, hba_mode, pipe_type, \
+                                         ateam_names)
         if status is False:
             return '', '', '', '', msg, True, \
                    {'display':'none'}, {}, {'display':'none'}, {}, \
