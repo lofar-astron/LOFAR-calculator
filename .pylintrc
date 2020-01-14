@@ -1,0 +1,22 @@
+[MASTER]
+
+ignore=
+
+[BASIC]
+good-names = 
+   lv,
+   ie,
+   d,
+   i,
+   c,
+   ra,
+   dec,
+   ax,
+   bandwidth,
+   n
+
+[FORMAT]
+max-line-length = 84
+
+[TYPECHECK]
+ignored-modules=astropy,ephem
