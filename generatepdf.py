@@ -46,7 +46,8 @@ def make_pdf_plot(elevation_fig, outfilename):
 
 def generate_pdf(pdf_file, obs_t, n_core, n_remote, n_int, n_chan, n_sb, integ_t,
                  antenna_set, pipe_type, t_avg, f_avg, is_dysco, im_noise_val,
-                 raw_size, proc_size, pipe_time, elevation_fig, distance_table):
+                 raw_size, proc_size, pipe_time, elevation_fig, distance_table,
+                 obs_date):
     """Function to generate a pdf file summarizing the content of the calculator.
        Return nothing."""
     # Create an A4 sheet
@@ -72,6 +73,12 @@ def generate_pdf(pdf_file, obs_t, n_core, n_remote, n_int, n_chan, n_sb, integ_t
     string += '<tr><td>Antenna set</td>'
     string += '    <td>{}</td></tr>'.format(antenna_set)
     string += '<tr></tr>'
+    if elevation_fig != {}:
+        # User has specified at least one source in the target setup
+        # Display the observation date in the table
+        string += '<tr><td>Observation date</td>'
+        string += '    <td>{}</td></tr>'.format(obs_date)
+        string += '<tr></tr>'
     string += '<tr><td>Pipeline type</td>'
     if pipe_type == 'none':
         string += '    <td>{}</td></tr>'.format('None')

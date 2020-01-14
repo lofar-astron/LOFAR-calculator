@@ -190,13 +190,15 @@ def on_resolve_click(n, close_msg_box, target_name, is_open):
      State('msgboxGenPdf', 'is_open'),
 
      State('elevation-plot', 'figure'),
-     State('distance-table', 'figure')
+     State('distance-table', 'figure'),
+     
+     State('dateRow', 'date')
     ]
 )
 def on_genpdf_click(n_clicks, close_msg_box, obs_t, n_core, n_remote, n_int, n_chan,
                     n_sb, integ_t, ant_set, pipe_type, t_avg, f_avg, is_dysco,
                     im_noise_val, raw_size, proc_size, pipe_time, is_msg_box_open,
-                    elevation_fig, distance_table):
+                    elevation_fig, distance_table, obs_date):
     """Function defines what to do when the generate pdf button is clicked"""
     if is_msg_box_open is True and close_msg_box is not None:
         # The message box is open and the user has clicked the close
@@ -219,7 +221,7 @@ def on_genpdf_click(n_clicks, close_msg_box, obs_t, n_core, n_remote, n_int, n_c
             g.generate_pdf(rel_path, obs_t, n_core, n_remote, n_int, n_chan,
                            n_sb, integ_t, ant_set, pipe_type, t_avg, f_avg,
                            is_dysco, im_noise_val, raw_size, proc_size, pipe_time,
-                           elevation_fig, distance_table)
+                           elevation_fig, distance_table, obs_date)
             return {'display':'block'}, '/luci/{}'.format(rel_path), False
 
 @app.server.route('/luci/static/<resource>')
