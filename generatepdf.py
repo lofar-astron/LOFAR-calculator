@@ -5,6 +5,9 @@ import os
 from fpdf import FPDF, HTMLMixin
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
+from pandas.plotting import register_matplotlib_converters
+register_matplotlib_converters()
 
 # Dummy class needed to generate the PDF file
 class MyFPDF(FPDF, HTMLMixin):
@@ -35,12 +38,38 @@ def make_pdf_plot(elevation_fig, outfilename):
     hour_loc = (0, 3, 6, 9, 12, 15, 18, 21)
     ax.xaxis.set_major_locator(mdates.HourLocator(hour_loc))
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
-    plt.xlabel('Time (UTC)')
-    plt.ylabel('Elevation (deg)')
-    plt.title('Target visibility plot')
+    plt.xlabel('Time (UTC)', fontsize=14)
+    plt.ylabel('Elevation (deg)', fontsize=14)
+    plt.title('Target visibility plot', fontsize=14)
+
+    # Highlight sunrise
+    sun_rise_dict = elevation_fig['layout']['shapes'][0]
+    temp_date = sun_rise_dict['x0'].split('.')[0]
+    x_min = datetime.strptime(temp_date, '%Y-%m-%dT%H:%M:%S')
+    temp_date = sun_rise_dict['x1'].split('.')[0]
+    x_max = datetime.strptime(temp_date, '%Y-%m-%dT%H:%M:%S')
+    y_min = sun_rise_dict['y0']
+    y_max = sun_rise_dict['y1']
+    rect = Rectangle((x_min, y_min), width=x_max-x_min, height=y_max, fill=True,
+                     edgecolor=None, facecolor='lightskyblue')
+    ax.add_patch(rect)
+
+    # Highlight sunset
+    sun_set_dict = elevation_fig['layout']['shapes'][1]
+    temp_date = sun_set_dict['x0'].split('.')[0]
+    x_min = datetime.strptime(temp_date, '%Y-%m-%dT%H:%M:%S')
+    temp_date = sun_set_dict['x1'].split('.')[0]
+    x_max = datetime.strptime(temp_date, '%Y-%m-%dT%H:%M:%S')
+    y_min = sun_set_dict['y0']
+    y_max = sun_set_dict['y1']
+    rect = Rectangle((x_min, y_min), width=x_max-x_min, height=y_max, fill=True,
+                     edgecolor=None, facecolor='lightskyblue')
+    ax.add_patch(rect)
+
+    plt.ylim([0, 90])
 
     if len(elevation_fig['data']) > 1:
-        ax.legend()
+        ax.legend(fontsize=14)
     plt.tight_layout()
     plt.savefig(outfilename, dpi=100)
 
