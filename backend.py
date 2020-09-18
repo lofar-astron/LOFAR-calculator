@@ -60,11 +60,11 @@ def calculate_im_noise(n_core, n_remote, n_int, hba_mode, obs_t, n_sb):
     im_noise *= 1.E6 # In uJy
     return '{:0.2f}'.format(im_noise)
 
-def calculate_raw_size(obs_t, int_time, n_baselines, n_chan, n_sb):
+def calculate_raw_size(obs_t, cal_t, n_cal, int_time, n_baselines, n_chan, n_sb, n_beams):
     """Compute the datasize of a raw LOFAR measurement set given the
        length of the observation, correlator integration time, number
        of baselines, number of channels per subband, and number of subbands"""
-    n_rows = int(n_baselines * (obs_t / int_time)) - n_baselines
+    n_rows = int(n_baselines * ( (obs_t*n_beams + cal_t*n_cal ) / int_time)) - n_baselines
     # A single row in LofarStMan format contains
     #    - 32-bit sequence number (4 bytes)
     #    - n_chan*16-bit samples for weight and sigma calculation (2*n_chan bytes)
@@ -73,7 +73,7 @@ def calculate_raw_size(obs_t, int_time, n_baselines, n_chan, n_sb):
     tot_size = sb_size * n_sb
     return '{:0.2f}'.format(tot_size)
 
-def calculate_proc_size(obs_t, int_time, n_baselines, n_chan, n_sb, pipe_type,
+def calculate_proc_size(obs_t, cal_t, n_cal, int_time, n_baselines, n_chan, n_sb, n_beams, pipe_type,
                         t_avg, f_avg, dy_compress):
     """Compute the datasize of averaged LOFAR measurement set given the
        length of the observation, integration time, number of baselines,
@@ -86,7 +86,7 @@ def calculate_proc_size(obs_t, int_time, n_baselines, n_chan, n_sb, pipe_type,
         n_chan //= f_avg
         # Change integ_t to account for t_avg
         int_time *= t_avg
-        n_rows = int(n_baselines * (obs_t / int_time)) - n_baselines
+        n_rows = int(n_baselines * ( (obs_t*n_beams + cal_t*n_cal ) / int_time)) - n_baselines
         # What does a single row in an averaged MS contain?
         sb_size = n_rows * ((7*8) + \
                          (4+(4*n_chan)) + \
@@ -102,7 +102,7 @@ def calculate_proc_size(obs_t, int_time, n_baselines, n_chan, n_sb, pipe_type,
             tot_size = tot_size/3.
         return '{:0.2f}'.format(tot_size)
 
-def calculate_pipe_time(obs_t, n_sb, array_mode, ateam_names, pipe_type):
+def calculate_pipe_time(obs_t, cal_t, n_cal, n_sb, n_beams, array_mode, ateam_names, pipe_type):
     """Compute the pipeline processing time.
        Inputs:
            obs_t - Observation time in hours
@@ -123,9 +123,9 @@ def calculate_pipe_time(obs_t, n_sb, array_mode, ateam_names, pipe_type):
 
     if pipe_type == 'preprocessing':
         if 'hba' in array_mode:
-            proc_time = hba_factor[n_ateams] * n_sb * obs_t
+            proc_time = hba_factor[n_ateams] * n_sb * ( obs_t * n_beams + cal_t * n_cal )
         else:
-            proc_time = lba_factor[n_ateams] * n_sb * obs_t
+            proc_time = lba_factor[n_ateams] * n_sb * ( obs_t * n_beams + cal_t * n_cal )
     # Convert to hours
     proc_time /= 3600.
     return proc_time

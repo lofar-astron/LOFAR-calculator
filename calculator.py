@@ -33,7 +33,7 @@ app.title = 'LUCI - LOFAR Unified Calculator for Imaging'
 ##############################################
 
 ##############################################
-# Show observational setup fields based on 
+# Show observational setup fields based on
 # obsMode dropdown value
 ##############################################
 @app.callback(
@@ -41,15 +41,15 @@ app.title = 'LUCI - LOFAR Unified Calculator for Imaging'
      Output('tabModeRowL', 'style'),
      Output('tabModeRow', 'style'),
      Output('tabModeRow', 'value'),
-     
+
      Output('stokesForm', 'style'),
      Output('stokesRowL', 'style'),
      Output('stokesRow', 'style'),
-     
+
      Output('nRingsForm', 'style'),
      Output('nRingsRow', 'style'),
      Output('nRingsRowL', 'style'),
-     
+
      Output('pipeTypeRow', 'options'),
      Output('pipeTypeRow', 'value')
     ],
@@ -78,13 +78,13 @@ def toggle_obs_mode(obs_value):
 # Show TAb stokes fields based on dropdown value
 ################################################
 @app.callback(
-    [Output('stokesRow', 'options'), 
+    [Output('stokesRow', 'options'),
      Output('stokesRow', 'value'),
-     
+
      Output('nRemoteForm', 'style'),
      Output('nRemoteRow', 'style'),
      Output('nRemoteRowL', 'style'),
-     
+
      Output('nIntForm', 'style'),
      Output('nIntRow', 'style'),
      Output('nIntRowL', 'style'),
@@ -108,7 +108,7 @@ def toggle_stokes(value):
     else:
         return valid_stokes, 'I', \
                {'display':'none'}, {'display':'none'}, {'display':'none'}, \
-               {'display':'none'}, {'display':'none'}, {'display':'none'}, 
+               {'display':'none'}, {'display':'none'}, {'display':'none'},
 
 
 ##############################################
@@ -312,6 +312,8 @@ def on_resolve_click(n, close_msg_box, target_name, is_open):
      Input('mbGenPdfClose', 'n_clicks')
     ],
     [State('obsTimeRow', 'value'),
+     State('calTimeRow', 'value'),
+     State('nCalRow', 'value'),
      State('nCoreRow', 'value'),
      State('nRemoteRow', 'value'),
      State('nIntRow', 'value'),
@@ -319,6 +321,7 @@ def on_resolve_click(n, close_msg_box, target_name, is_open):
      State('nSbRow', 'value'),
      State('intTimeRow', 'value'),
      State('hbaDualRow', 'value'),
+     State('coordRow', 'value'),
 
      State('pipeTypeRow', 'value'),
      State('tAvgRow', 'value'),
@@ -338,8 +341,8 @@ def on_resolve_click(n, close_msg_box, target_name, is_open):
      State('dateRow', 'date')
     ]
 )
-def on_genpdf_click(n_clicks, close_msg_box, obs_t, n_core, n_remote, n_int, n_chan,
-                    n_sb, integ_t, ant_set, pipe_type, t_avg, f_avg, is_dysco,
+def on_genpdf_click(n_clicks, close_msg_box, obs_t, cal_t, n_cal, n_core, n_remote, n_int, n_chan,
+                    n_sb, integ_t, ant_set, coord, pipe_type, t_avg, f_avg, is_dysco,
                     im_noise_val, raw_size, proc_size, pipe_time, is_msg_box_open,
                     elevation_fig, distance_table, obs_date):
     """Function defines what to do when the generate pdf button is clicked"""
@@ -361,8 +364,8 @@ def on_genpdf_click(n_clicks, close_msg_box, obs_t, n_core, n_remote, n_int, n_c
             # Generate a relative and absolute filenames to the pdf file
             rel_path = os.path.join(rel_path, 'summary_{}.pdf'.format(randnum))
             abs_path = os.path.join(os.getcwd(), rel_path)
-            g.generate_pdf(rel_path, obs_t, n_core, n_remote, n_int, n_chan,
-                           n_sb, integ_t, ant_set, pipe_type, t_avg, f_avg,
+            g.generate_pdf(rel_path, obs_t, cal_t, n_cal, n_core, n_remote, n_int, n_chan,
+                           n_sb, integ_t, ant_set, coord, pipe_type, t_avg, f_avg,
                            is_dysco, im_noise_val, raw_size, proc_size, pipe_time,
                            elevation_fig, distance_table, obs_date)
             return {'display':'block'}, '/luci/{}'.format(rel_path), False
@@ -393,6 +396,8 @@ def serve_static(resource):
      Input('msgBoxClose', 'n_clicks'),
     ],
     [State('obsTimeRow', 'value'),
+     State('calTimeRow', 'value'),
+     State('nCalRow', 'value'),
      State('nCoreRow', 'value'),
      State('nRemoteRow', 'value'),
      State('nIntRow', 'value'),
@@ -412,7 +417,7 @@ def serve_static(resource):
      State('demixListRow', 'value')
     ]
 )
-def on_calculate_click(n, n_clicks, obs_t, n_core, n_remote, n_int, n_chan, n_sb,
+def on_calculate_click(n, n_clicks, obs_t, cal_t, n_cal, n_core, n_remote, n_int, n_chan, n_sb,
                        integ_t, hba_mode, pipe_type, t_avg, f_avg, dy_compress,
                        is_open, src_name, coord, obs_date, calib_names,
                        ateam_names):
@@ -451,29 +456,33 @@ def on_calculate_click(n, n_clicks, obs_t, n_core, n_remote, n_int, n_chan, n_sb
                    {'display':'none'}, {}
         else:
             # Estimate the raw data size
+            if coord is not '':
+                coord_list = coord.split(',')
+                coord_input_list = coord.split(',')
+                n_sap=len(coord_list)
+            else:
+                n_sap=1
+
             n_baselines = bk.compute_baselines(int(n_core), int(n_remote),
                                                int(n_int), hba_mode)
             im_noise = bk.calculate_im_noise(int(n_core), int(n_remote),
                                              int(n_int), hba_mode, float(obs_t),
                                              int(n_sb))
-            raw_size = bk.calculate_raw_size(float(obs_t), float(integ_t),
-                                             n_baselines, int(n_chan), int(n_sb))
-            avg_size = bk.calculate_proc_size(float(obs_t), float(integ_t),
-                                              n_baselines, int(n_chan), int(n_sb),
+            raw_size = bk.calculate_raw_size(float(obs_t), float(cal_t), int(n_cal), float(integ_t),
+                                             n_baselines, int(n_chan), int(n_sb), n_sap)
+            avg_size = bk.calculate_proc_size(float(obs_t), float(cal_t), int(n_cal), float(integ_t),
+                                              n_baselines, int(n_chan), int(n_sb), n_sap,
                                               pipe_type, int(t_avg), int(f_avg),
                                               dy_compress)
             if pipe_type == 'none':
                 # No pipeline
                 pipe_time = None
             else:
-                pipe_time = bk.calculate_pipe_time(float(obs_t), int(n_sb),
+                pipe_time = bk.calculate_pipe_time(float(obs_t), float(cal_t), int(n_cal), int(n_sb), n_sap,
                                                    hba_mode, ateam_names,
                                                    pipe_type)
 
             # It is useful to have coord as a list from now on
-            if coord is not '':
-                coord_list = coord.split(',')
-                coord_input_list = coord.split(',')
 
             # Add calibrator names to the target list so that they can be
             # plotted together. Before doing that, make a copy of the input
@@ -512,11 +521,11 @@ def on_calculate_click(n, n_clicks, obs_t, n_core, n_remote, n_int, n_chan, n_sb
                 # in the validate_inputs function.
                 # Check if the number of SAPs is less than 488
                 n_point = len(coord_input_list)
-                n_sap = n_point * int(n_sb)
-                max_sap = 488
-                if n_sap > max_sap:
+                n_beamlet = n_point * int(n_sb)
+                max_beamlet = 488
+                if n_beamlet > max_beamlet:
                     msg = 'Number of targets times number of subbands cannot ' + \
-                          'be greater than {}.'.format(max_sap)
+                          'be greater than {}.'.format(max_beamlet)
                     return '', '', '', '', msg, True, \
                            {'display':'none'}, {}, {'display':'none'}, {}, \
                            {'display':'none'}, {}
