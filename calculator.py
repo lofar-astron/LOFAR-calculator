@@ -446,7 +446,7 @@ def on_calculate_click(n, n_clicks, obs_t, cal_t, n_cal, n_core, n_remote, n_int
             n_remote = '0'
         if n_int is None:
             n_int = '0'
-        status, msg = bk.validate_inputs(obs_t, int(n_core), int(n_remote), \
+        status, msg = bk.validate_inputs(obs_t, cal_t, int(n_cal), int(n_core), int(n_remote), \
                                          int(n_int), n_sb, integ_t, t_avg, f_avg, \
                                          src_name, coord, hba_mode, pipe_type, \
                                          ateam_names)

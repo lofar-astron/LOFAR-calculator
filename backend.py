@@ -130,7 +130,7 @@ def calculate_pipe_time(obs_t, cal_t, n_cal, n_sb, n_beams, array_mode, ateam_na
     proc_time /= 3600.
     return proc_time
 
-def validate_inputs(obs_t, n_core, n_remote, n_int, n_sb, integ_t, t_avg,
+def validate_inputs(obs_t, cal_t, n_cal, n_core, n_remote, n_int, n_sb, integ_t, t_avg,
                     f_avg, src_name, coord, hba_mode, pipe_type, ateam_names):
     """Valid text input supplied by the user: observation time, number of
        subbands, and integration time. Following checks will be performed:
@@ -150,13 +150,29 @@ def validate_inputs(obs_t, n_core, n_remote, n_int, n_sb, integ_t, t_avg,
        Return state=True/False accompanied by an error msg
        Note: all input parameters are still strings."""
     msg = ''
-    # Validate the length of the observing time
+    # Validate the length of the observing times
     try:
         float(obs_t)
-        if float(obs_t) <= 0:
-            msg += 'Observation time cannot be zero or negative.\n'
+        if float(obs_t) < 0:
+            msg += 'Observation time cannot be negative.\n'
     except ValueError:
         msg += 'Invalid observation time specified.\n'
+    try:
+        float(cal_t)
+        if float(cal_t) < 0:
+            msg += 'Calibrator duration cannot be negative.\n'
+    except ValueError:
+        msg += 'Invalid calibrator duration specified.\n'
+    try:
+        float(cal_t)+float(obs_t)
+        if float(cal_t)+float(obs_t) <= 0:
+            msg += 'One of Observation time and Calibration duration must be at least one.\n'
+    except ValueError:
+        msg += 'Invalid calibrator duration or observation time specified.\n'
+
+    # Validate the number of calibrators
+    if n_cal < 0:
+        msg += 'Number of calibrators cannot be negative.\n'
     # Validate the number of stations
     if n_core < 0 or n_core > 24:
         msg += 'Number of core stations must be between 0 and 24.\n'
