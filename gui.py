@@ -252,11 +252,27 @@ fAvg = dbc.FormGroup([
                      id='fAvgRowL'
            ),
            dbc.Col(
-            dbc.Input(type='number', 
-                      id='fAvgRow', 
-                      min=0,
-                      value=defaultParams['fAvg']
-            ), width=inpWidth
+            dcc.Dropdown(
+                    options=[
+                        {'label':'1', 'value':1},
+                        {'label':'2', 'value':2},
+                        {'label':'4', 'value':4},
+                        {'label':'8', 'value':8},
+                        {'label':'16', 'value':16},
+                        {'label':'32', 'value':32},
+                        {'label':'64', 'value':64},
+                        {'label':'128', 'value':128},
+                        {'label':'256', 'value':256}
+                    ], value=defaultParams['fAvg'],
+                       clearable=False, id='fAvgRow',
+                ), width=dropWidth
+
+
+#            dbc.Input(type='number',
+#                      id='fAvgRow',
+#                      min=0,
+#                      value=defaultParams['fAvg']
+#            ), width=inpWidth
            )
        ], row=True)
 dyCompress = dbc.FormGroup([

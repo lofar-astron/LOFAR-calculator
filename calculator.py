@@ -179,22 +179,22 @@ def validate_t_avg(n_blur, n_clicks, value, is_open):
 #######################################
 @app.callback(
     Output('msgboxFAvg', 'is_open'),
-    [Input('fAvgRow', 'n_blur'),
+    [Input('fAvgRow', 'value'),
      Input('mbfAvgClose', 'n_clicks')
     ],
-    [State('fAvgRow', 'value'),
-     State('msgboxFAvg', 'is_open')
+    [State('msgboxFAvg', 'is_open'),
+     State('nChanRow','value')
     ]
 )
-def validate_t_avg(n_blur, n_clicks, value, is_open):
+def validate_f_avg(value, n_clicks, is_open, channels_per_subband):
     """Validate frequency averaging factor and display error message if needed"""
     if is_open is True and n_clicks is not None:
         # The message box is open and the user has clicked the close
         # button. Close the alert message
         return False
-    if n_blur is None:
+    #if n_blur is None:
         # The page is loading. Do not validate anything
-        return False
+    #    return False
     else:
         # Text box has lost focus.
         # Go ahead and validate the text in it.
@@ -202,7 +202,71 @@ def validate_t_avg(n_blur, n_clicks, value, is_open):
             int(str(value))
         except ValueError:
             return True
+        try:
+            assert int(str(channels_per_subband))>=int(str(value))
+        except:
+            return True
         return False
+
+
+#######################################
+# Limit freq averaging factor
+#######################################
+@app.callback(
+    Output('fAvgRow', 'options'),
+    [Input('nChanRow', 'value'),
+     Input('mbfAvgClose', 'n_clicks')
+    ],
+    [State('msgboxFAvg', 'is_open'),
+    ]
+)
+def validate_f_avg(value, n_clicks, is_open):
+    """Validate frequency averaging factor and display error message if needed"""
+    if is_open is True and n_clicks is not None:
+        # The message box is open and the user has clicked the close
+        # button. Close the alert message
+        return False
+    #if n_blur is None:
+        # The page is loading. Do not validate anything
+    #    return False
+    else:
+        # Text box has lost focus.
+        # Go ahead and validate the text in it.
+        if int(str(value))==64:
+            return [
+                        {'label':'1', 'value':1},
+                        {'label':'2', 'value':2},
+                        {'label':'4', 'value':4},
+                        {'label':'8', 'value':8},
+                        {'label':'16', 'value':16},
+                        {'label':'32', 'value':32},
+                        {'label':'64', 'value':64},
+                    ]
+        elif  int(str(value))==128:
+            return [
+                        {'label':'1', 'value':1},
+                        {'label':'2', 'value':2},
+                        {'label':'4', 'value':4},
+                        {'label':'8', 'value':8},
+                        {'label':'16', 'value':16},
+                        {'label':'32', 'value':32},
+                        {'label':'64', 'value':64},
+                        {'label':'128', 'value':128},
+                    ]
+        # else, return default, max 256 averaging factor
+        return [
+                        {'label':'1', 'value':1},
+                        {'label':'2', 'value':2},
+                        {'label':'4', 'value':4},
+                        {'label':'8', 'value':8},
+                        {'label':'16', 'value':16},
+                        {'label':'32', 'value':32},
+                        {'label':'64', 'value':64},
+                        {'label':'128', 'value':128},
+                        {'label':'256', 'value':256}
+                    ]
+
+
 
 #######################################
 # What should the resolve button do?
