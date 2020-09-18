@@ -88,6 +88,7 @@ def get_tile_beam(coord):
         this_coord = SkyCoord(c)
         temp_ra += this_coord.ra.degree
         temp_dec += this_coord.dec.degree
+    temp_ra=(temp_ra+180)%(360)-180 # fix a problem near 24h/0h
     t_beam = SkyCoord(temp_ra/n_beams, temp_dec/n_beams, unit=u.deg)
     return t_beam
 
@@ -130,9 +131,16 @@ def find_beam_layout(src_name, coord, n_core, n_remote, n_int, antenna_mode):
 
     label_offset = 0.5
     # Iterate over coord and plot the station beam
+    # 23h40m +72d, 0h20m +72d
     index = 0
-    for c in coord_list:
-        s_beam = SkyCoord(c)
+    s_beams = [SkyCoord(c) for c in coord_list]
+    # check if we're crossing zero degrees
+    s_ras = [s_beam.ra.deg for s_beam in s_beams]
+    crossing_zero_degrees=False
+    if np.max(np.abs(np.diff(s_ras))) > 50:
+        crossing_zero_degrees=True
+    for s_beam in s_beams:#c in coord_list:
+        #s_beam = SkyCoord(c)
         layout['shapes'].append({
             'type':'circle',
             'xref':'x',
@@ -143,6 +151,42 @@ def find_beam_layout(src_name, coord, n_core, n_remote, n_int, antenna_mode):
             'y1': s_beam.dec.deg+station_beam_size,
             'line': {'color':'rgba(50, 171, 96, 1)'}
         })
+        if crossing_zero_degrees:
+            if s_beam.ra.deg>180:
+                layout['shapes'].append({
+                    'type':'circle',
+                    'xref':'x',
+                    'yref':'y',
+                    'x0': (s_beam.ra.deg-station_beam_size+180)%360-180,
+                    'x1': (s_beam.ra.deg+station_beam_size+180)%360-180,
+                    'y0': s_beam.dec.deg-station_beam_size,
+                    'y1': s_beam.dec.deg+station_beam_size,
+                    'line': {'color':'rgba(50, 171, 96, 1)'}
+                })
+                data.append(
+                Scatter(x=[(s_beam.ra.deg+180)%360-180],
+                    y=[s_beam.dec.deg+station_beam_size+label_offset],
+                    text=[src_name_list[index]],
+                    mode='text')
+                )
+            else:
+                layout['shapes'].append({
+                    'type':'circle',
+                    'xref':'x',
+                    'yref':'y',
+                    'x0': (s_beam.ra.deg-station_beam_size-180)%360+180,
+                    'x1': (s_beam.ra.deg+station_beam_size-180)%360+180,
+                    'y0': s_beam.dec.deg-station_beam_size,
+                    'y1': s_beam.dec.deg+station_beam_size,
+                    'line': {'color':'rgba(50, 171, 96, 1)'}
+                })
+                data.append(
+                Scatter(x=[(s_beam.ra.deg-180)%360+180],
+                    y=[s_beam.dec.deg+station_beam_size+label_offset],
+                    text=[src_name_list[index]],
+                    mode='text')
+                )
+
         data.append(
             Scatter(x=[s_beam.ra.deg],
                     y=[s_beam.dec.deg+station_beam_size+label_offset],
@@ -165,6 +209,22 @@ def find_beam_layout(src_name, coord, n_core, n_remote, n_int, antenna_mode):
             'y1': t_beam.dec.deg+TILE_BEAM_SIZE/2,
             'line': {'color':'rgba(250, 0, 250, 1)'}
         })
+        if crossing_zero_degrees:
+            if t_beam.ra.deg > 180:
+                t_offset=-360
+            else:
+                t_offset=360
+            layout['shapes'].append({
+            'type':'circle',
+            'xref':'x',
+            'yref':'y',
+            'x0': t_beam.ra.deg-TILE_BEAM_SIZE/2+t_offset,
+            'x1': t_beam.ra.deg+TILE_BEAM_SIZE/2+t_offset,
+            'y0': t_beam.dec.deg-TILE_BEAM_SIZE/2,
+            'y1': t_beam.dec.deg+TILE_BEAM_SIZE/2,
+            'line': {'color':'rgba(250, 0, 250, 1)'}
+            })
+
         data.append(
             Scatter(x=[t_beam.ra.deg],
                     y=[t_beam.dec.deg+TILE_BEAM_SIZE/2 + label_offset],
