@@ -254,8 +254,11 @@ pipeType = dbc.FormGroup([
             dbc.Label('Pipeline', width=labelWidth-inpWidth),
             dbc.Col(
                 dcc.Dropdown(
-                    options=[],
-                    value=defaultParams['pipeType'], searchable=False,
+                    options=[
+                        {'label':'None', 'value':'none'},
+                        {'label':'Preprocessing', 'value':'preprocessing'},
+                        #{'label':'Prefactor', 'value':'prefactor'}
+                    ], value=defaultParams['pipeType'], searchable=False,
                        clearable=False, id='pipeTypeRow'
                 ), width=dropWidth
             )
