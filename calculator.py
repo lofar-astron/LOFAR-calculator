@@ -46,14 +46,6 @@ app.title = 'LUCI - LOFAR Unified Calculator for Imaging'
      Output('stokesRowL', 'style'),
      Output('stokesRow', 'style'),
      
-     Output('nRemoteForm', 'style'),
-     Output('nRemoteRow', 'style'),
-     Output('nRemoteRowL', 'style'),
-     
-     Output('nIntForm', 'style'),
-     Output('nIntRow', 'style'),
-     Output('nIntRowL', 'style'),
-     
      Output('nRingsForm', 'style'),
      Output('nRingsRow', 'style'),
      Output('nRingsRowL', 'style'),
@@ -63,26 +55,22 @@ app.title = 'LUCI - LOFAR Unified Calculator for Imaging'
     ],
     [Input('obsModeRow', 'value')]
 )
-def toggle_obs_mode(value):
+def toggle_obs_mode(obs_value):
     """Function to show relevant observational setup fields
        depending on the user's choice"""
     all_pipelines = {
         'Interferometric': ['none', 'preprocessing'],
         'Beamformed': ['none', 'pulp']
     }
-    valid_pipes = [{'label':i, 'value':i} for i in all_pipelines[value]]
-    if value == 'Interferometric':
-        return {'display':'none'}, {'display':'none'}, {'display':'none'}, '', \
+    valid_pipes = [{'label':i, 'value':i} for i in all_pipelines[obs_value]]
+    if obs_value == 'Interferometric':
+        return {'display':'none'}, {'display':'none'}, {'display':'none'}, 'Incoherent', \
                {'display':'none'}, {'display':'none'}, {'display':'none'}, \
-               {}, {'display':'block'}, {'display':'block'}, \
-               {}, {'display':'block'}, {'display':'block'}, \
                {'display':'none'}, {'display':'none'}, {'display':'none'}, \
                valid_pipes, 'none'
     else:
-        return {}, {'display':'block'}, {'display':'block'}, 'Coherent', \
+        return {}, {'display':'block'}, {'display':'block'}, 'Incoherent', \
                {}, {'display':'block'}, {'display':'block'}, \
-               {'display':'none'}, {'display':'none'}, {'display':'none'}, \
-               {'display':'none'}, {'display':'none'}, {'display':'none'}, \
                {}, {'display':'block'}, {'display':'block'}, \
                valid_pipes, 'none'
 
@@ -91,7 +79,15 @@ def toggle_obs_mode(value):
 ################################################
 @app.callback(
     [Output('stokesRow', 'options'), 
-     Output('stokesRow', 'value')
+     Output('stokesRow', 'value'),
+     
+     Output('nRemoteForm', 'style'),
+     Output('nRemoteRow', 'style'),
+     Output('nRemoteRowL', 'style'),
+     
+     Output('nIntForm', 'style'),
+     Output('nIntRow', 'style'),
+     Output('nIntRowL', 'style'),
     ],
     [Input('tabModeRow', 'value')]
 )
@@ -105,7 +101,14 @@ def toggle_stokes(value):
         'Incoherent': ['I', 'IQUV']
     }
     valid_stokes = [{'label':i, 'value':i} for i in all_stokes[value]]
-    return valid_stokes, 'I'        
+    if value == 'Incoherent':
+        return valid_stokes, 'I', \
+               {}, {'display':'block'}, {'display':'block'}, \
+               {}, {'display':'block'}, {'display':'block'}
+    else:
+        return valid_stokes, 'I', \
+               {'display':'none'}, {'display':'none'}, {'display':'none'}, \
+               {'display':'none'}, {'display':'none'}, {'display':'none'}, 
 
 
 ##############################################
