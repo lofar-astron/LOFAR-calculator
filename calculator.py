@@ -519,7 +519,7 @@ def on_calculate_click(n, n_clicks, obs_t, cal_t, n_cal, n_core, n_remote, n_int
             else:
                 # User has specified a coordinate and it has passed validation
                 # in the validate_inputs function.
-                # Check if the number of SAPs is less than 488
+                # Check if the number of beamlets is less than 488
                 n_point = len(coord_input_list)
                 n_beamlet = n_point * int(n_sb)
                 max_beamlet = 488
