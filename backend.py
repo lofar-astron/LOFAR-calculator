@@ -73,6 +73,16 @@ def calculate_raw_size(obs_t, int_time, n_baselines, n_chan, n_sb):
     tot_size = sb_size * n_sb
     return '{:0.2f}'.format(tot_size)
 
+def calculate_bf_size(n_sub, n_chan, n_pol, n_value, t_samp, obs_time):
+    """Calculate the datasize of a raw LOFAR beamformed dataset.
+       Based on equation from Cees Bassa available on confluence at
+       https://support.astron.nl/confluence/display/C2/Data+Rates 
+       For now, we always assume 32 bits and no downsampling factor"""
+    n_bit = 32
+    size_Gbs = n_sub * n_chan * n_pol * n_value * n_bit / (n_chan * t_samp * 1E-6)
+    size_GB = size_Gbs * obs_time / 8.
+    return size_GB
+
 def calculate_proc_size(obs_t, int_time, n_baselines, n_chan, n_sb, pipe_type,
                         t_avg, f_avg, dy_compress):
     """Compute the datasize of averaged LOFAR measurement set given the

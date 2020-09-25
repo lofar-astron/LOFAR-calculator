@@ -345,13 +345,16 @@ def serve_static(resource):
      State('coordRow', 'value'),
      State('dateRow', 'date'),
      State('calListRow', 'value'),
-     State('demixListRow', 'value')
+     State('demixListRow', 'value'),
+     State('obsModeRow', 'value'),
+     State('tabModeRow', 'value'),
+     State('stokesRow', 'value')
     ]
 )
 def on_calculate_click(n, n_clicks, obs_t, n_core, n_remote, n_int, n_chan, n_sb,
                        integ_t, hba_mode, pipe_type, t_avg, f_avg, dy_compress,
                        is_open, src_name, coord, obs_date, calib_names,
-                       ateam_names):
+                       ateam_names, obs_mode, tab_mode, stokes):
     """Function defines what to do when the calculate button is clicked"""
     if is_open is True:
         # User has closed the error message box
@@ -392,19 +395,38 @@ def on_calculate_click(n, n_clicks, obs_t, n_core, n_remote, n_int, n_chan, n_sb
             im_noise = bk.calculate_im_noise(int(n_core), int(n_remote),
                                              int(n_int), hba_mode, float(obs_t),
                                              int(n_sb))
-            raw_size = bk.calculate_raw_size(float(obs_t), float(integ_t),
-                                             n_baselines, int(n_chan), int(n_sb))
-            avg_size = bk.calculate_proc_size(float(obs_t), float(integ_t),
-                                              n_baselines, int(n_chan), int(n_sb),
-                                              pipe_type, int(t_avg), int(f_avg),
-                                              dy_compress)
+
+            if obs_mode == 'Interferometric':
+                # Calculate interferometric raw size
+                raw_size = bk.calculate_raw_size(float(obs_t), float(integ_t),
+                                                 n_baselines, int(n_chan), int(n_sb))
+            if obs_mode == 'Beamformed':
+                # Calculate beamformed datasize
+                if stokes == 'I':
+                    n_pol = 1
+                    n_value = 1
+                if stokes == 'IQUV':
+                    n_pol = 4
+                    n_value = 1
+                if stokes == 'XXYY':
+                    n_pol = 2
+                    n_value =2
+                raw_size = bk.calculate_bf_size(int(n_sb), int(n_chan), \
+                                                n_pol, n_value, float(integ_t), \
+                                                float(obs_t))
+                
             if pipe_type == 'none':
                 # No pipeline
                 pipe_time = None
+                avg_size = 0
             else:
                 pipe_time = bk.calculate_pipe_time(float(obs_t), int(n_sb),
                                                    hba_mode, ateam_names,
                                                    pipe_type)
+                avg_size = bk.calculate_proc_size(float(obs_t), float(integ_t),
+                                                  n_baselines, int(n_chan), int(n_sb),
+                                                  pipe_type, int(t_avg), int(f_avg),
+                                                  dy_compress)
 
             # It is useful to have coord as a list from now on
             if coord is not '':
