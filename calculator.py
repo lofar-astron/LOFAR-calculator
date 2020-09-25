@@ -51,7 +51,10 @@ app.title = 'LUCI - LOFAR Unified Calculator for Imaging'
      Output('nRingsRowL', 'style'),
      
      Output('pipeTypeRow', 'options'),
-     Output('pipeTypeRow', 'value')
+     Output('pipeTypeRow', 'value'),
+     
+     Output('imNoiseRowL', 'style'),
+     Output('imNoiseRow', 'style')
     ],
     [Input('obsModeRow', 'value')]
 )
@@ -67,12 +70,14 @@ def toggle_obs_mode(obs_value):
         return {'display':'none'}, {'display':'none'}, {'display':'none'}, 'Incoherent', \
                {'display':'none'}, {'display':'none'}, {'display':'none'}, \
                {'display':'none'}, {'display':'none'}, {'display':'none'}, \
-               valid_pipes, 'none'
+               valid_pipes, 'none', \
+               {'display':'block'}, {'display':'block'}
     else:
         return {}, {'display':'block'}, {'display':'block'}, 'Incoherent', \
                {}, {'display':'block'}, {'display':'block'}, \
                {}, {'display':'block'}, {'display':'block'}, \
-               valid_pipes, 'none'
+               valid_pipes, 'none', \
+               {'display':'none'}, {'display':'none'}
 
 ################################################
 # Show TAb stokes fields based on dropdown value

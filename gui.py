@@ -358,7 +358,8 @@ pipeGUIFrame = html.Div(children=[
 # Layout of the results tab
 ###############################################################################
 imNoise = dbc.FormGroup([
-            dbc.Label('Theoretical image sensitivity (uJy/beam)', width=labelWidth),
+            dbc.Label('Theoretical image sensitivity (uJy/beam)', width=labelWidth,
+                      id='imNoiseRowL'),
             dbc.Col(
                 dbc.Input(type='text', id='imNoiseRow', value='', 
                           disabled=True
