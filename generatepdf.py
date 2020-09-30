@@ -74,7 +74,8 @@ def make_pdf_plot(elevation_fig, outfilename):
 def generate_pdf(pdf_file, obs_t, cal_t, n_cal, n_core, n_remote, n_int, n_chan, n_sb, integ_t,
                  antenna_set, coord, pipe_type, t_avg, f_avg, is_dysco, im_noise_val,
                  raw_size, proc_size, pipe_time, elevation_fig, distance_table,
-                 obs_date, obs_mode, tab_mode, stokes):
+                 obs_date, obs_mode, tab_mode, stokes,
+                 pulp_avg, pulp_8bit, pulp_digifil, pulp_pdmp, pulp_singlepulse, pulp_rrats):
     """Function to generate a pdf file summarizing the content of the calculator.
        Return nothing."""
     # Create an A4 sheet
@@ -94,7 +95,7 @@ def generate_pdf(pdf_file, obs_t, cal_t, n_cal, n_core, n_remote, n_int, n_chan,
     string += '<thead><tr><th width="70%" align="left">Parameter</th>'
     string += '<th width="30%" align="left">Value</th></tr></thead>'
     string += '<tbody>'
-    
+
     if obs_mode == 'Interferometric':
         string += '<tr><td>Observation mode</td>'
         string += '    <td>Interferometric</td></tr>'
@@ -105,9 +106,9 @@ def generate_pdf(pdf_file, obs_t, cal_t, n_cal, n_core, n_remote, n_int, n_chan,
         string += '    <td>{}</td></tr>'.format(tab_mode)
         string += '<tr><td>Stokes products to record</td>'
         string += '    <td>{}</td></tr>'.format(stokes)
-    
+
     string += '<tr></tr>'
-    
+
     string += '<tr><td>Observation time (in seconds)</td>'
     string += '    <td>{}</td></tr>'.format(obs_t)
     string += '<tr><td>Calibrator duration (in seconds)</td>'
@@ -140,7 +141,7 @@ def generate_pdf(pdf_file, obs_t, cal_t, n_cal, n_core, n_remote, n_int, n_chan,
     string += '<tr><td>Pipeline type</td>'
     if pipe_type == 'none':
         string += '    <td>{}</td></tr>'.format('None')
-    else:
+    elif pipe_type == 'preprocessing':
         string += '    <td>{}</td></tr>'.format('Preprocessing')
         string += '<tr><td>Averaging factor (time, freq)</td>'
         string += '    <td>{}, {}</td></tr>'.format(t_avg, f_avg)
@@ -149,6 +150,9 @@ def generate_pdf(pdf_file, obs_t, cal_t, n_cal, n_core, n_remote, n_int, n_chan,
             string += '    <td>{}</td></tr>'.format('enabled')
         else:
             string += '    <td>{}</td></tr>'.format('disabled')
+    elif pipe_type == 'pulp':
+        string += '    <td>{}</td></tr>'.format('Pulp')
+
     if obs_mode == 'Interferometric':
         string += '<tr></tr>'
         string += '<tr><td>Theoretical image sensitivity (uJy/beam)</td>'

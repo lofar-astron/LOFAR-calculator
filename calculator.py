@@ -52,7 +52,7 @@ app.title = 'LUCI - LOFAR Unified Calculator for Imaging'
 
      Output('pipeTypeRow', 'options'),
      Output('pipeTypeRow', 'value'),
-     
+
      Output('imNoiseRowL', 'style'),
      Output('imNoiseRow', 'style')
     ],
@@ -403,16 +403,25 @@ def on_resolve_click(n, close_msg_box, target_name, is_open):
      State('distance-table', 'figure'),
 
      State('dateRow', 'date'),
-     
+
      State('obsModeRow', 'value'),
      State('tabModeRow', 'value'),
-     State('stokesRow', 'value')
+     State('stokesRow', 'value'),
+
+     State('tAvgPulpRow', 'value'),
+     State('8bitRow', 'value'),
+     State('digifilRow', 'value'),
+     State('pdmpRow', 'value'),
+     State('singlePulseRow', 'value'),
+     State('rratsRow', 'value'),
+
+
     ]
 )
 def on_genpdf_click(n_clicks, close_msg_box, obs_t, cal_t, n_cal, n_core, n_remote, n_int, n_chan,
                     n_sb, integ_t, ant_set, coord, pipe_type, t_avg, f_avg, is_dysco,
                     im_noise_val, raw_size, proc_size, pipe_time, is_msg_box_open,
-                    elevation_fig, distance_table, obs_date, obs_mode, tab_mode, stokes):
+                    elevation_fig, distance_table, obs_date, obs_mode, tab_mode, stokes, pulp_avg, pulp_8bit, pulp_digifil, pulp_pdmp, pulp_singlepulse, pulp_rrats):
     """Function defines what to do when the generate pdf button is clicked"""
     if is_msg_box_open is True and close_msg_box is not None:
         # The message box is open and the user has clicked the close
@@ -435,8 +444,9 @@ def on_genpdf_click(n_clicks, close_msg_box, obs_t, cal_t, n_cal, n_core, n_remo
             g.generate_pdf(rel_path, obs_t, cal_t, n_cal, n_core, n_remote, n_int, n_chan,
                            n_sb, integ_t, ant_set, coord, pipe_type, t_avg, f_avg,
                            is_dysco, im_noise_val, raw_size, proc_size, pipe_time,
-                           elevation_fig, distance_table, obs_date, 
-                           obs_mode, tab_mode, stokes)
+                           elevation_fig, distance_table, obs_date,
+                           obs_mode, tab_mode, stokes,
+                           pulp_avg, pulp_8bit, pulp_digifil, pulp_pdmp, pulp_singlepulse, pulp_rrats)
             return {'display':'block'}, '/luci/{}'.format(rel_path), False
 
 @app.server.route('/luci/static/<resource>')
@@ -563,7 +573,7 @@ def on_calculate_click(n, n_clicks, obs_t, cal_t, n_cal, n_core, n_remote, n_int
                 raw_size = bk.calculate_bf_size(int(n_sb), int(n_chan), \
                                                 n_pol, n_value, float(integ_t), \
                                                 float(obs_t))
-                
+
             if pipe_type == 'none':
                 # No pipeline
                 pipe_time = None
