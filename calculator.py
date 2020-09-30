@@ -129,11 +129,26 @@ def toggle_stokes(value):
      Output('pipeSizeRowL', 'style'),
      Output('pipeSizeRow', 'style'),
      Output('pipeProcTimeRow', 'style'),
-     Output('pipeProcTimeRowL', 'style')
+     Output('pipeProcTimeRowL', 'style'),
+     Output('tAvgPulpRow', 'style'),
+     Output('tAvgPulpRowL', 'style'),
+     Output('8bitRow', 'style'),
+     Output('8bitRowL', 'style'),
+     Output('digifilRow', 'style'),
+     Output('digifilRowL', 'style'),
+     Output('pdmpRow', 'style'),
+     Output('pdmpRowL', 'style'),
+     Output('singlePulseRow', 'style'),
+     Output('singlePulseRowL', 'style'),
+     Output('rratsRow', 'style'),
+     Output('rratsRowL', 'style'),
+     Output('tAvgPulpRow', 'value'),
+
     ],
-    [Input('pipeTypeRow', 'value')]
+    [Input('pipeTypeRow', 'value'),Input('stokesRow', 'value')],
+
 )
-def toggle_pipeline(value):
+def toggle_pipeline(value,stokes):
     """Function to show relevant pipeline fields depending on
        the user's pipeline choice."""
     if value == 'none':
@@ -141,13 +156,57 @@ def toggle_pipeline(value):
                {'display':'none'}, {'display':'none'}, \
                {'display':'none'}, {'display':'none'}, \
                {'display':'none'}, {'display':'none'}, \
-               {'display':'none'}, {'display':'none'}
+               {'display':'none'}, {'display':'none'}, \
+               {'display':'none'}, {'display':'none'}, \
+               {'display':'none'}, {'display':'none'}, \
+               {'display':'none'}, {'display':'none'}, \
+               {'display':'none'}, {'display':'none'}, \
+               {'display':'none'}, {'display':'none'}, \
+               {'display':'none'}, {'display':'none'}, \
+               60
     elif value == 'preprocessing':
         return {'display':'block'}, {'display':'block'}, \
                {'display':'block'}, {'display':'block'}, \
                {'display':'block'}, {'display':'block'}, \
                {'display':'block'}, {'display':'block'}, \
-               {'display':'block'}, {'display':'block'}
+               {'display':'block'}, {'display':'block'}, \
+               {'display':'none'}, {'display':'none'}, \
+               {'display':'none'}, {'display':'none'}, \
+               {'display':'none'}, {'display':'none'}, \
+               {'display':'none'}, {'display':'none'}, \
+               {'display':'none'}, {'display':'none'}, \
+               {'display':'none'}, {'display':'none'}, \
+               60
+    elif value == 'pulp':
+        if stokes == 'XXYY':
+           return {'display':'none'}, {'display':'none'}, \
+               {'display':'none'}, {'display':'none'}, \
+               {'display':'none'}, {'display':'none'}, \
+               {'display':'none'}, {'display':'none'}, \
+               {'display':'none'}, {'display':'none'}, \
+               {'display':'block'}, {'display':'block'}, \
+               {'display':'block'}, {'display':'block'}, \
+               {'display':'block'}, {'display':'block'}, \
+               {'display':'block'}, {'display':'block'}, \
+               {'display':'none'}, {'display':'none'}, \
+               {'display':'none'}, {'display':'none'}, \
+               5
+        else:
+           return {'display':'none'}, {'display':'none'}, \
+               {'display':'none'}, {'display':'none'}, \
+               {'display':'none'}, {'display':'none'}, \
+               {'display':'none'}, {'display':'none'}, \
+               {'display':'none'}, {'display':'none'}, \
+               {'display':'block'}, {'display':'block'}, \
+               {'display':'none'}, {'display':'none'}, \
+               {'display':'none'}, {'display':'none'}, \
+               {'display':'none'}, {'display':'none'}, \
+               {'display':'block'}, {'display':'block'}, \
+               {'display':'block'}, {'display':'block'}, \
+               60
+
+
+
 
 #######################################
 # Validate time averaging factor
