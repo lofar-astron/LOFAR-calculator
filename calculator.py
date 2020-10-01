@@ -33,7 +33,7 @@ app.title = 'LUCI - LOFAR Unified Calculator for Imaging'
 ##############################################
 
 ##############################################
-# Show observational setup fields based on 
+# Show observational setup fields based on
 # obsMode dropdown value
 ##############################################
 @app.callback(
@@ -41,15 +41,15 @@ app.title = 'LUCI - LOFAR Unified Calculator for Imaging'
      Output('tabModeRowL', 'style'),
      Output('tabModeRow', 'style'),
      Output('tabModeRow', 'value'),
-     
+
      Output('stokesForm', 'style'),
      Output('stokesRowL', 'style'),
      Output('stokesRow', 'style'),
-     
+
      Output('nRingsForm', 'style'),
      Output('nRingsRow', 'style'),
      Output('nRingsRowL', 'style'),
-     
+
      Output('pipeTypeRow', 'options'),
      Output('pipeTypeRow', 'value'),
      
@@ -83,13 +83,13 @@ def toggle_obs_mode(obs_value):
 # Show TAb stokes fields based on dropdown value
 ################################################
 @app.callback(
-    [Output('stokesRow', 'options'), 
+    [Output('stokesRow', 'options'),
      Output('stokesRow', 'value'),
-     
+
      Output('nRemoteForm', 'style'),
      Output('nRemoteRow', 'style'),
      Output('nRemoteRowL', 'style'),
-     
+
      Output('nIntForm', 'style'),
      Output('nIntRow', 'style'),
      Output('nIntRowL', 'style'),
@@ -113,7 +113,7 @@ def toggle_stokes(value):
     else:
         return valid_stokes, 'I', \
                {'display':'none'}, {'display':'none'}, {'display':'none'}, \
-               {'display':'none'}, {'display':'none'}, {'display':'none'}, 
+               {'display':'none'}, {'display':'none'}, {'display':'none'},
 
 
 ##############################################
@@ -184,22 +184,22 @@ def validate_t_avg(n_blur, n_clicks, value, is_open):
 #######################################
 @app.callback(
     Output('msgboxFAvg', 'is_open'),
-    [Input('fAvgRow', 'n_blur'),
+    [Input('fAvgRow', 'value'),
      Input('mbfAvgClose', 'n_clicks')
     ],
-    [State('fAvgRow', 'value'),
-     State('msgboxFAvg', 'is_open')
+    [State('msgboxFAvg', 'is_open'),
+     State('nChanRow','value')
     ]
 )
-def validate_t_avg(n_blur, n_clicks, value, is_open):
+def validate_f_avg(value, n_clicks, is_open, channels_per_subband):
     """Validate frequency averaging factor and display error message if needed"""
     if is_open is True and n_clicks is not None:
         # The message box is open and the user has clicked the close
         # button. Close the alert message
         return False
-    if n_blur is None:
+    #if n_blur is None:
         # The page is loading. Do not validate anything
-        return False
+    #    return False
     else:
         # Text box has lost focus.
         # Go ahead and validate the text in it.
@@ -207,7 +207,71 @@ def validate_t_avg(n_blur, n_clicks, value, is_open):
             int(str(value))
         except ValueError:
             return True
+        try:
+            assert int(str(channels_per_subband))>=int(str(value))
+        except:
+            return True
         return False
+
+
+#######################################
+# Limit freq averaging factor
+#######################################
+@app.callback(
+    Output('fAvgRow', 'options'),
+    [Input('nChanRow', 'value'),
+     Input('mbfAvgClose', 'n_clicks')
+    ],
+    [State('msgboxFAvg', 'is_open'),
+    ]
+)
+def validate_f_avg(value, n_clicks, is_open):
+    """Validate frequency averaging factor and display error message if needed"""
+    if is_open is True and n_clicks is not None:
+        # The message box is open and the user has clicked the close
+        # button. Close the alert message
+        return False
+    #if n_blur is None:
+        # The page is loading. Do not validate anything
+    #    return False
+    else:
+        # Text box has lost focus.
+        # Go ahead and validate the text in it.
+        if int(str(value))==64:
+            return [
+                        {'label':'1', 'value':1},
+                        {'label':'2', 'value':2},
+                        {'label':'4', 'value':4},
+                        {'label':'8', 'value':8},
+                        {'label':'16', 'value':16},
+                        {'label':'32', 'value':32},
+                        {'label':'64', 'value':64},
+                    ]
+        elif  int(str(value))==128:
+            return [
+                        {'label':'1', 'value':1},
+                        {'label':'2', 'value':2},
+                        {'label':'4', 'value':4},
+                        {'label':'8', 'value':8},
+                        {'label':'16', 'value':16},
+                        {'label':'32', 'value':32},
+                        {'label':'64', 'value':64},
+                        {'label':'128', 'value':128},
+                    ]
+        # else, return default, max 256 averaging factor
+        return [
+                        {'label':'1', 'value':1},
+                        {'label':'2', 'value':2},
+                        {'label':'4', 'value':4},
+                        {'label':'8', 'value':8},
+                        {'label':'16', 'value':16},
+                        {'label':'32', 'value':32},
+                        {'label':'64', 'value':64},
+                        {'label':'128', 'value':128},
+                        {'label':'256', 'value':256}
+                    ]
+
+
 
 #######################################
 # What should the resolve button do?
@@ -253,6 +317,8 @@ def on_resolve_click(n, close_msg_box, target_name, is_open):
      Input('mbGenPdfClose', 'n_clicks')
     ],
     [State('obsTimeRow', 'value'),
+     State('calTimeRow', 'value'),
+     State('nCalRow', 'value'),
      State('nCoreRow', 'value'),
      State('nRemoteRow', 'value'),
      State('nIntRow', 'value'),
@@ -260,6 +326,7 @@ def on_resolve_click(n, close_msg_box, target_name, is_open):
      State('nSbRow', 'value'),
      State('intTimeRow', 'value'),
      State('hbaDualRow', 'value'),
+     State('coordRow', 'value'),
 
      State('pipeTypeRow', 'value'),
      State('tAvgRow', 'value'),
@@ -283,8 +350,8 @@ def on_resolve_click(n, close_msg_box, target_name, is_open):
      State('stokesRow', 'value')
     ]
 )
-def on_genpdf_click(n_clicks, close_msg_box, obs_t, n_core, n_remote, n_int, n_chan,
-                    n_sb, integ_t, ant_set, pipe_type, t_avg, f_avg, is_dysco,
+def on_genpdf_click(n_clicks, close_msg_box, obs_t, cal_t, n_cal, n_core, n_remote, n_int, n_chan,
+                    n_sb, integ_t, ant_set, coord, pipe_type, t_avg, f_avg, is_dysco,
                     im_noise_val, raw_size, proc_size, pipe_time, is_msg_box_open,
                     elevation_fig, distance_table, obs_date, obs_mode, tab_mode, stokes):
     """Function defines what to do when the generate pdf button is clicked"""
@@ -306,8 +373,8 @@ def on_genpdf_click(n_clicks, close_msg_box, obs_t, n_core, n_remote, n_int, n_c
             # Generate a relative and absolute filenames to the pdf file
             rel_path = os.path.join(rel_path, 'summary_{}.pdf'.format(randnum))
             abs_path = os.path.join(os.getcwd(), rel_path)
-            g.generate_pdf(rel_path, obs_t, n_core, n_remote, n_int, n_chan,
-                           n_sb, integ_t, ant_set, pipe_type, t_avg, f_avg,
+            g.generate_pdf(rel_path, obs_t, cal_t, n_cal, n_core, n_remote, n_int, n_chan,
+                           n_sb, integ_t, ant_set, coord, pipe_type, t_avg, f_avg,
                            is_dysco, im_noise_val, raw_size, proc_size, pipe_time,
                            elevation_fig, distance_table, obs_date, 
                            obs_mode, tab_mode, stokes)
@@ -339,6 +406,8 @@ def serve_static(resource):
      Input('msgBoxClose', 'n_clicks'),
     ],
     [State('obsTimeRow', 'value'),
+     State('calTimeRow', 'value'),
+     State('nCalRow', 'value'),
      State('nCoreRow', 'value'),
      State('nRemoteRow', 'value'),
      State('nIntRow', 'value'),
@@ -361,7 +430,7 @@ def serve_static(resource):
      State('stokesRow', 'value')
     ]
 )
-def on_calculate_click(n, n_clicks, obs_t, n_core, n_remote, n_int, n_chan, n_sb,
+def on_calculate_click(n, n_clicks, obs_t, cal_t, n_cal, n_core, n_remote, n_int, n_chan, n_sb,
                        integ_t, hba_mode, pipe_type, t_avg, f_avg, dy_compress,
                        is_open, src_name, coord, obs_date, calib_names,
                        ateam_names, obs_mode, tab_mode, stokes):
@@ -390,7 +459,7 @@ def on_calculate_click(n, n_clicks, obs_t, n_core, n_remote, n_int, n_chan, n_sb
             n_remote = '0'
         if n_int is None:
             n_int = '0'
-        status, msg = bk.validate_inputs(obs_t, int(n_core), int(n_remote), \
+        status, msg = bk.validate_inputs(obs_t, cal_t, int(n_cal), int(n_core), int(n_remote), \
                                          int(n_int), n_sb, integ_t, t_avg, f_avg, \
                                          src_name, coord, hba_mode, pipe_type, \
                                          ateam_names)
@@ -400,6 +469,13 @@ def on_calculate_click(n, n_clicks, obs_t, n_core, n_remote, n_int, n_chan, n_sb
                    {'display':'none'}, {}
         else:
             # Estimate the raw data size
+            if coord is not '':
+                coord_list = coord.split(',')
+                coord_input_list = coord.split(',')
+                n_sap=len(coord_list)
+            else:
+                n_sap=1
+
             n_baselines = bk.compute_baselines(int(n_core), int(n_remote),
                                                int(n_int), hba_mode)
             im_noise = bk.calculate_im_noise(int(n_core), int(n_remote),
@@ -408,8 +484,12 @@ def on_calculate_click(n, n_clicks, obs_t, n_core, n_remote, n_int, n_chan, n_sb
 
             if obs_mode == 'Interferometric':
                 # Calculate interferometric raw size
-                raw_size = bk.calculate_raw_size(float(obs_t), float(integ_t),
-                                                 n_baselines, int(n_chan), int(n_sb))
+                raw_size = bk.calculate_raw_size(float(obs_t), float(cal_t), int(n_cal), float(integ_t),
+                                                 n_baselines, int(n_chan), int(n_sb), n_sap)
+                avg_size = bk.calculate_proc_size(float(obs_t), float(cal_t), int(n_cal), float(integ_t),
+                                              n_baselines, int(n_chan), int(n_sb), n_sap,
+                                              pipe_type, int(t_avg), int(f_avg),
+                                              dy_compress)
             if obs_mode == 'Beamformed':
                 # Calculate beamformed datasize
                 if stokes == 'I':
@@ -430,18 +510,15 @@ def on_calculate_click(n, n_clicks, obs_t, n_core, n_remote, n_int, n_chan, n_sb
                 pipe_time = None
                 avg_size = 0
             else:
-                pipe_time = bk.calculate_pipe_time(float(obs_t), int(n_sb),
+                pipe_time = bk.calculate_pipe_time(float(obs_t), float(cal_t), int(n_cal), int(n_sb), n_sap,
                                                    hba_mode, ateam_names,
                                                    pipe_type)
-                avg_size = bk.calculate_proc_size(float(obs_t), float(integ_t),
-                                                  n_baselines, int(n_chan), int(n_sb),
-                                                  pipe_type, int(t_avg), int(f_avg),
-                                                  dy_compress)
+                avg_size = bk.calculate_proc_size(float(obs_t), float(cal_t), int(n_cal), float(integ_t),
+                                              n_baselines, int(n_chan), int(n_sb), n_sap,
+                                              pipe_type, int(t_avg), int(f_avg),
+                                              dy_compress)
 
             # It is useful to have coord as a list from now on
-            if coord is not '':
-                coord_list = coord.split(',')
-                coord_input_list = coord.split(',')
 
             # Add calibrator names to the target list so that they can be
             # plotted together. Before doing that, make a copy of the input
@@ -478,13 +555,13 @@ def on_calculate_click(n, n_clicks, obs_t, n_core, n_remote, n_int, n_chan, n_sb
             else:
                 # User has specified a coordinate and it has passed validation
                 # in the validate_inputs function.
-                # Check if the number of SAPs is less than 488
+                # Check if the number of beamlets is less than 488
                 n_point = len(coord_input_list)
-                n_sap = n_point * int(n_sb)
-                max_sap = 488
-                if n_sap > max_sap:
+                n_beamlet = n_point * int(n_sb)
+                max_beamlet = 488
+                if n_beamlet > max_beamlet:
                     msg = 'Number of targets times number of subbands cannot ' + \
-                          'be greater than {}.'.format(max_sap)
+                          'be greater than {}.'.format(max_beamlet)
                     return '', '', '', '', msg, True, \
                            {'display':'none'}, {}, {'display':'none'}, {}, \
                            {'display':'none'}, {}

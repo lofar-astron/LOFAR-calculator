@@ -71,8 +71,8 @@ def make_pdf_plot(elevation_fig, outfilename):
     plt.tight_layout()
     plt.savefig(outfilename, dpi=100)
 
-def generate_pdf(pdf_file, obs_t, n_core, n_remote, n_int, n_chan, n_sb, integ_t,
-                 antenna_set, pipe_type, t_avg, f_avg, is_dysco, im_noise_val,
+def generate_pdf(pdf_file, obs_t, cal_t, n_cal, n_core, n_remote, n_int, n_chan, n_sb, integ_t,
+                 antenna_set, coord, pipe_type, t_avg, f_avg, is_dysco, im_noise_val,
                  raw_size, proc_size, pipe_time, elevation_fig, distance_table,
                  obs_date, obs_mode, tab_mode, stokes):
     """Function to generate a pdf file summarizing the content of the calculator.
@@ -81,6 +81,13 @@ def generate_pdf(pdf_file, obs_t, n_core, n_remote, n_int, n_chan, n_sb, integ_t
     pdf = MyFPDF('P', 'mm', 'A4')
     pdf.add_page()
     pdf.set_font('Arial', '', 16)
+
+    if coord is not '':
+        coord_list = coord.split(',')
+        coord_input_list = coord.split(',')
+        n_sap=len(coord_list)
+    else:
+        n_sap=None
 
     # Generate an html string to be written to the file
     string = '<table border="0" align="left" width="80%">'
@@ -103,6 +110,13 @@ def generate_pdf(pdf_file, obs_t, n_core, n_remote, n_int, n_chan, n_sb, integ_t
     
     string += '<tr><td>Observation time (in seconds)</td>'
     string += '    <td>{}</td></tr>'.format(obs_t)
+    string += '<tr><td>Calibrator duration (in seconds)</td>'
+    string += '    <td>{}</td></tr>'.format(cal_t)
+    string += '<tr><td>Number of calibrators</td>'
+    string += '    <td>{}</td></tr>'.format(n_cal)
+    if n_sap:
+        string += '<tr><td>Number of simultaneous targets</td>'
+        string += '    <td>{}</td></tr>'.format(n_sap)
     string += '<tr><td>No. of stations</td>'
     if obs_mode == 'Beamformed' and tab_mode == 'Coherent':
         string += '    <td>({}, {}, {})</td></tr>'.format(n_core, 0, 0)
