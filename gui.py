@@ -67,6 +67,13 @@ defaultParams = {'obsMode':'Interferometric',
                  'fAvg':'4',
                  'dyCompress':'enable',
 
+                 'tAvgPulp':'60',
+                 '8bit':'NO',
+                 'digifil':'NO',
+                 'no_pdmp':'NO',
+                 'single_pulse':'NO',
+                 'rrats':'NO',
+
                  'targetName':'',
                  'target_coord':'',
                 }
@@ -257,6 +264,8 @@ pipeType = dbc.FormGroup([
                     options=[
                         {'label':'None', 'value':'none'},
                         {'label':'Preprocessing', 'value':'preprocessing'},
+                        {'label':'Pulsar pipeline', 'value':'pulp'},
+
                         #{'label':'Prefactor', 'value':'prefactor'}
                     ], value=defaultParams['pipeType'], searchable=False,
                        clearable=False, id='pipeTypeRow'
@@ -318,6 +327,108 @@ dyCompress = dbc.FormGroup([
                 )
              ], row=True)
 pipeGUISetup = dbc.Form([pipeType, tAvg, fAvg, dyCompress])
+
+###############################################################################
+# Define the layout of the pulp setup
+###############################################################################
+
+tAvgPulp = dbc.FormGroup([
+           dbc.Label('Length of subintegration (sec)', width=labelWidth-inpWidth,
+                     id='tAvgPulpRowL'
+           ),
+           dbc.Col(
+            dbc.Input(type='number',
+                      id='tAvgPulpRow',
+                      min=0,
+                      value=defaultParams['tAvgPulp']
+            ), width=inpWidth
+           )
+       ], row=True)
+
+
+rawTo8bitPulp = dbc.FormGroup([
+           dbc.Label('Convert raw data to 8-bit', width=labelWidth-inpWidth,
+                     id='8bitRowL'
+           ),
+           dbc.Col(
+            dcc.Dropdown(
+                    options=[
+                        {'label':'YES', 'value':'YES'},
+                        {'label':'NO', 'value':'NO'},
+                        {'label':'ONLY', 'value':'ONLY'},
+                    ], value=defaultParams['8bit'],
+                       clearable=False, id='8bitRow',
+                ), width=dropWidth
+           )
+       ], row=True)
+
+digifilPulp =  dbc.FormGroup([
+           dbc.Label('Run digifil', width=labelWidth-inpWidth,
+                     id='digifilRowL'
+           ),
+           dbc.Col(
+            dcc.Dropdown(
+                    options=[
+                        {'label':'YES', 'value':'YES'},
+                        {'label':'NO', 'value':'NO'},
+                    ], value=defaultParams['digifil'],
+                       clearable=False, id='digifilRow',
+                ), width=dropWidth
+                           )
+       ], row=True)
+
+pdmpPulp =  dbc.FormGroup([
+           dbc.Label('Skip pdmp', width=labelWidth-inpWidth,
+                     id='pdmpRowL'
+           ),
+           dbc.Col(
+            dcc.Dropdown(
+                    options=[
+                        {'label':'YES', 'value':'YES'},
+                        {'label':'NO', 'value':'NO'},
+                    ], value=defaultParams['no_pdmp'],
+                       clearable=False, id='pdmpRow',
+                ), width=dropWidth
+                           )
+       ], row=True)
+
+singlePulsePulp =  dbc.FormGroup([
+           dbc.Label('Single pulse search', width=labelWidth-inpWidth,
+                     id='singlePulseRowL'
+           ),
+           dbc.Col(
+            dcc.Dropdown(
+                    options=[
+                        {'label':'YES', 'value':'YES'},
+                        {'label':'NO', 'value':'NO'},
+                    ], value=defaultParams['single_pulse'],
+                       clearable=False, id='singlePulseRow',
+                ), width=dropWidth
+                           )
+       ], row=True)
+
+rratsPulp =  dbc.FormGroup([
+           dbc.Label('Search for RRATS', width=labelWidth-inpWidth,
+                     id='rratsRowL'
+           ),
+           dbc.Col(
+            dcc.Dropdown(
+                    options=[
+                        {'label':'YES', 'value':'YES'},
+                        {'label':'NO', 'value':'NO'},
+                    ], value=defaultParams['rrats'],
+                       clearable=False, id='rratsRow',
+                ), width=dropWidth
+                           )
+       ], row=True)
+
+
+
+
+pipeGUISetupPulp = dbc.Form([rawTo8bitPulp, digifilPulp, pdmpPulp, tAvgPulp, singlePulsePulp , rratsPulp   ])
+
+
+
 
 ###############################################################################
 # Define the layout of the target setup
@@ -396,6 +507,7 @@ pipeGUIFrame = html.Div(children=[
                 html.H3('Pipeline setup'),
                 html.Hr(),
                 pipeGUISetup,
+                pipeGUISetupPulp,
                ], style={'width':'95%', 'padding':'20px'})
 
 ###############################################################################
