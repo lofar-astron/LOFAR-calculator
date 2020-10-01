@@ -64,6 +64,7 @@ def calculate_raw_size(obs_t, cal_t, n_cal, int_time, n_baselines, n_chan, n_sb,
     """Compute the datasize of a raw LOFAR measurement set given the
        length of the observation, correlator integration time, number
        of baselines, number of channels per subband, and number of subbands"""
+    # TODO: The below equation needs to be fixed (scale n_baselines).
     n_rows = int(n_baselines * ( (obs_t*n_beams + cal_t*n_cal ) / int_time)) - n_baselines
     # A single row in LofarStMan format contains
     #    - 32-bit sequence number (4 bytes)
@@ -72,6 +73,16 @@ def calculate_raw_size(obs_t, cal_t, n_cal, int_time, n_baselines, n_chan, n_sb,
     sb_size = n_rows * ((4) + (2*n_chan) + (4*n_chan*2*4))/(1024*1024*1024) # in GB
     tot_size = sb_size * n_sb
     return '{:0.2f}'.format(tot_size)
+
+def calculate_bf_size(n_sub, n_chan, n_pol, n_value, t_samp, obs_time):
+    """Calculate the datasize of a raw LOFAR beamformed dataset.
+       Based on equation from Cees Bassa available on confluence at
+       https://support.astron.nl/confluence/display/C2/Data+Rates 
+       For now, we always assume 32 bits and no downsampling factor"""
+    n_bit = 32
+    size_Gbs = n_sub * n_chan * n_pol * n_value * n_bit / (n_chan * t_samp * 1E-6)
+    size_GB = size_Gbs * obs_time / 8.
+    return size_GB
 
 def calculate_proc_size(obs_t, cal_t, n_cal, int_time, n_baselines, n_chan, n_sb, n_beams, pipe_type,
                         t_avg, f_avg, dy_compress):

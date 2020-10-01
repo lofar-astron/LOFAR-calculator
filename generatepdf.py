@@ -74,7 +74,7 @@ def make_pdf_plot(elevation_fig, outfilename):
 def generate_pdf(pdf_file, obs_t, cal_t, n_cal, n_core, n_remote, n_int, n_chan, n_sb, integ_t,
                  antenna_set, coord, pipe_type, t_avg, f_avg, is_dysco, im_noise_val,
                  raw_size, proc_size, pipe_time, elevation_fig, distance_table,
-                 obs_date):
+                 obs_date, obs_mode, tab_mode, stokes):
     """Function to generate a pdf file summarizing the content of the calculator.
        Return nothing."""
     # Create an A4 sheet
@@ -94,6 +94,20 @@ def generate_pdf(pdf_file, obs_t, cal_t, n_cal, n_core, n_remote, n_int, n_chan,
     string += '<thead><tr><th width="70%" align="left">Parameter</th>'
     string += '<th width="30%" align="left">Value</th></tr></thead>'
     string += '<tbody>'
+    
+    if obs_mode == 'Interferometric':
+        string += '<tr><td>Observation mode</td>'
+        string += '    <td>Interferometric</td></tr>'
+    else:
+        string += '<tr><td>Observation mode</td>'
+        string += '    <td>Beamformed</td></tr>'
+        string += '<tr><td>Tied array mode</td>'
+        string += '    <td>{}</td></tr>'.format(tab_mode)
+        string += '<tr><td>Stokes products to record</td>'
+        string += '    <td>{}</td></tr>'.format(stokes)
+    
+    string += '<tr></tr>'
+    
     string += '<tr><td>Observation time (in seconds)</td>'
     string += '    <td>{}</td></tr>'.format(obs_t)
     string += '<tr><td>Calibrator duration (in seconds)</td>'
@@ -104,7 +118,10 @@ def generate_pdf(pdf_file, obs_t, cal_t, n_cal, n_core, n_remote, n_int, n_chan,
         string += '<tr><td>Number of simultaneous targets</td>'
         string += '    <td>{}</td></tr>'.format(n_sap)
     string += '<tr><td>No. of stations</td>'
-    string += '    <td>({}, {}, {})</td></tr>'.format(n_core, n_remote, n_int)
+    if obs_mode == 'Beamformed' and tab_mode == 'Coherent':
+        string += '    <td>({}, {}, {})</td></tr>'.format(n_core, 0, 0)
+    else:
+        string += '    <td>({}, {}, {})</td></tr>'.format(n_core, n_remote, n_int)
     string += '<tr><td>No. of subbands</td>'
     string += '    <td>{}</td></tr>'.format(n_sb)
     string += '<tr><td>No. of channels per subband</td>'
@@ -132,9 +149,10 @@ def generate_pdf(pdf_file, obs_t, cal_t, n_cal, n_core, n_remote, n_int, n_chan,
             string += '    <td>{}</td></tr>'.format('enabled')
         else:
             string += '    <td>{}</td></tr>'.format('disabled')
-    string += '<tr></tr>'
-    string += '<tr><td>Theoretical image sensitivity (uJy/beam)</td>'
-    string += '    <td>{}</td></tr>'.format(im_noise_val)
+    if obs_mode == 'Interferometric':
+        string += '<tr></tr>'
+        string += '<tr><td>Theoretical image sensitivity (uJy/beam)</td>'
+        string += '    <td>{}</td></tr>'.format(im_noise_val)
     string += '<tr><td>Raw data size (in GB)</td>'
     string += '    <td>{}</td></tr>'.format(raw_size)
     if pipe_type != 'none':
