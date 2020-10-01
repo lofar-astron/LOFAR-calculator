@@ -137,8 +137,10 @@ def find_beam_layout(src_name, coord, n_core, n_remote, n_int, antenna_mode):
     # check if we're crossing zero degrees
     s_ras = [s_beam.ra.deg for s_beam in s_beams]
     crossing_zero_degrees=False
-    if np.max(np.abs(np.diff(s_ras))) > 50:
-        crossing_zero_degrees=True
+    # we need at least two beams, for the diff function
+    if len(s_ras)>1:
+        if np.max(np.abs(np.diff(s_ras))) > 50:
+            crossing_zero_degrees=True
     for s_beam in s_beams:#c in coord_list:
         #s_beam = SkyCoord(c)
         layout['shapes'].append({
