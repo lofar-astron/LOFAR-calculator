@@ -513,10 +513,10 @@ def on_calculate_click(n, n_clicks, obs_t, cal_t, n_cal, n_core, n_remote, n_int
                 pipe_time = bk.calculate_pipe_time(float(obs_t), float(cal_t), int(n_cal), int(n_sb), n_sap,
                                                    hba_mode, ateam_names,
                                                    pipe_type)
-                avg_size = bk.calculate_proc_size(float(obs_t), float(integ_t),
-                                                  n_baselines, int(n_chan), int(n_sb),
-                                                  pipe_type, int(t_avg), int(f_avg),
-                                                  dy_compress)
+                avg_size = bk.calculate_proc_size(float(obs_t), float(cal_t), int(n_cal), float(integ_t),
+                                              n_baselines, int(n_chan), int(n_sb), n_sap,
+                                              pipe_type, int(t_avg), int(f_avg),
+                                              dy_compress)
 
             # It is useful to have coord as a list from now on
 
