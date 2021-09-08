@@ -556,7 +556,7 @@ The various features of this calculator are documented on the [LOFAR Imaging Coo
 
 The sensitivity calculation performed by this tool follow [SKA Memo 113](http://www.skatelescope.org/uploaded/59513_113_Memo_Nijboer.pdf) by Nijboer, Pandey-Pommier & de Bruyn. It uses theoretical SEFD values. So, please use it with caution.
 
-LUCI (version 20200114) was written and is maintained for the LOFAR Science Operations & Support group by Sarrvesh Sridhar. The source code is publicly available on [GitHub](https://github.com/scisup/LOFAR-calculator). For comments and/or feature requests, please contact the Science Operations & Support group using the [Helpdesk](https://support.astron.nl/rohelpdesk).
+LUCI (version 20200114) was written by Sarrvesh Sridhar and is now maintained for the ASTRON Science Data Center Operations group by Sander ter Veen. The source code is publicly available on [ASTRON Git](https://git.astron.nl/ao/sdco/LOFAR-calculator.git).
 """
 cautiontext = html.Div([
                   dcc.Markdown(children=warntext)
